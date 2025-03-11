@@ -3,10 +3,29 @@ html, body{
     font-weight: 500;
 }
 
+.date{
+    float: right;
+    text-align: right;
+    margin-top: 15px;
+}
+
+.date .bookMonth, .date .bookYear{
+    width: 25%;
+    display: inline-block;
+}
+
+.currentsaldo{
+    padding:20px 0;
+}
+
 .saldo{
     text-align: right;
     font-size: 25px;
-    margin-bottom: 40px;
+}
+
+.beginSaldo{
+    width: 25%;
+    display: inline-block;
 }
 
 .logo{
@@ -23,4 +42,13 @@ html, body{
     color: #ffffff;
     padding: 10px 15px;
     font-size: 20px;
+}
+
+.incTotal, .outTotal{
+    font-weight: bold;
+    color: #000000;
+}
+
+.form-control{
+    border: solid 1px #bbb !important;
 }
