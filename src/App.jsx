@@ -84,7 +84,7 @@ function App() {
 
   return (
     <React.Fragment>
-      <div className="container">
+      <div className="container-fluid">
         <div className='date'>
           Maand: <select className="form-control bookMonth" defaultValue={new Date().getMonth()} name="bookMonth" style={{ marginRight: "15px" }}>
             <option value="1">Januari</option>
