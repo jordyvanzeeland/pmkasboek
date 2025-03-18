@@ -143,7 +143,7 @@ function App() {
         <div className='row'>
           <div className='col-md-6'>
             <div className='inkomsten'>
-              <h3>Inkomsten</h3>
+              <h3>Inkomsten <span style={{ float: "right" }}>Totaal: &euro; {inctotal}</span></h3>
 
               <form method="POST" onSubmit={(event) => addIncome(event)}>
                 <table className='table'>
@@ -178,13 +178,12 @@ function App() {
                   </tbody>
                 </table>
               </form>
-              <div className="incTotal">Totaal inkomsten: &euro; {inctotal}</div>
             </div>
           </div>
 
           <div className='col-md-6'>
             <div className='uitgaven'>
-              <h3>Uitgaven</h3>
+              <h3>Uitgaven <span style={{ float: "right" }}>Totaal: &euro; {outtotal}</span></h3>
 
               <form method="POST" onSubmit={(event) => addExpanse(event)}>
                 <table className='table'>
@@ -219,7 +218,6 @@ function App() {
                   </tbody>
                 </table>
               </form>
-              <div className="outTotal">Totaal uitgaven: &euro; {outtotal}</div>
             </div>
           </div>
         </div>
