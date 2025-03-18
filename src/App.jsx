@@ -9,6 +9,7 @@ function App() {
   const [isSortedAmountAsc, setIsSortedAmountAsc] = useState(true);
   const [inctotal, setInctotal] = useState(0);
   const [outtotal, setOuttotal] = useState(0);
+  const [selectedMonth, setSelectedMonth] = useState(0);
 
   const sortOnDate = (type, list) => {
     let sortedList = [...list].sort((a, b) => {
@@ -42,12 +43,31 @@ function App() {
     return sortedList;
   }
 
+  const deleteAmount = (type, id) => {
+    const typeArray = type === "expanses" ? expanses : incomes;
+    const updatedArray = typeArray.filter((item) => item.id !== id);
+    const deletedItem = typeArray.find((item) => item.id === id);
+
+    if (deletedItem) {
+      if(type === 'expanses'){
+        setExpanses(updatedArray);
+        setOuttotal((prevOuttotal) => prevOuttotal - parseFloat(deletedItem.money.replace(",", ".")));
+        setNewSaldo((prevSaldo) => prevSaldo + parseFloat(deletedItem.money.replace(",", ".")));
+      }else{
+        setIncomes(updatedArray);
+        setInctotal((prevInctotal) => prevInctotal - parseFloat(deletedItem.money.replace(",", ".")));
+        setNewSaldo((prevSaldo) => prevSaldo - parseFloat(deletedItem.money.replace(",", ".")));
+      }  
+    }
+  }
+
   const addIncome = (event) => {
     event.preventDefault();
 
     const newIncome = {
+      id: incomes.length + 1,
       date: event.target.inkdate.value,
-      category: event.target.inkcat.value,
+      code: event.target.inkcode.value,
       desc: event.target.inkdesc.value,
       money: event.target.inkmoney.value
     }
@@ -63,10 +83,11 @@ function App() {
     event.preventDefault();
 
     const newExpanse = {
-      "date": event.target.uitdate.value,
-      "category": event.target.uitcat.value,
-      "desc": event.target.uitdesc.value,
-      "money": event.target.uitmoney.value
+      id: expanses.length + 1,
+      date: event.target.uitdate.value,
+      code: event.target.uitcode.value,
+      desc: event.target.uitdesc.value,
+      money: event.target.uitmoney.value
     }
 
     if (newSaldo - parseFloat(newExpanse.money) >= 0) {
@@ -78,41 +99,37 @@ function App() {
     } else {
       alert('Saldo wordt negatief. Kan deze uitgave niet toevoegen.')
     }
-
-
   }
 
   return (
     <React.Fragment>
       <div className="container-fluid">
-        <div className='date'>
-          Maand: <select className="form-control bookMonth" defaultValue={new Date().getMonth()} name="bookMonth" style={{ marginRight: "15px" }}>
-            <option value="1">Januari</option>
-            <option value="2">Februari</option>
-            <option value="3">Maart</option>
-            <option value="4">April</option>
-            <option value="5">Mei</option>
-            <option value="6">Juni</option>
-            <option value="7">Juli</option>
-            <option value="8">Augustus</option>
-            <option value="9">September</option>
-            <option value="10">Oktober</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
-          Boekjaar: <input className="form-control bookYear" type="text" name="bookYear" />
+        <div className='months'>
+          <ul>
+            <li onClick={() => setSelectedMonth(1)} className={selectedMonth === 1 ? "active" : ''} value="1">Januari</li>
+            <li onClick={() => setSelectedMonth(2)} className={selectedMonth === 2 ? "active" : ''} value="2">Februari</li>
+            <li onClick={() => setSelectedMonth(3)} className={selectedMonth === 3 ? "active" : ''} value="3">Maart</li>
+            <li onClick={() => setSelectedMonth(4)} className={selectedMonth === 4 ? "active" : ''} value="4">April</li>
+            <li onClick={() => setSelectedMonth(5)} className={selectedMonth === 5 ? "active" : ''} value="5">Mei</li>
+            <li onClick={() => setSelectedMonth(6)} className={selectedMonth === 6 ? "active" : ''} value="6">Juni</li>
+            <li onClick={() => setSelectedMonth(7)} className={selectedMonth === 7 ? "active" : ''} value="7">Juli</li>
+            <li onClick={() => setSelectedMonth(8)} className={selectedMonth === 8 ? "active" : ''} value="8">Augustus</li>
+            <li onClick={() => setSelectedMonth(9)} className={selectedMonth === 9 ? "active" : ''} value="9">September</li>
+            <li onClick={() => setSelectedMonth(10)} className={selectedMonth === 10 ? "active" : ''} value="10">Oktober</li>
+            <li onClick={() => setSelectedMonth(11)} className={selectedMonth === 11 ? "active" : ''} value="11">November</li>
+            <li onClick={() => setSelectedMonth(12)} className={selectedMonth === 12 ? "active" : ''} value="12">December</li>
+          </ul>
         </div>
 
         <div className="logo">
           <span>PM</span>Kasboek
         </div>
-        
-        
 
         <div className='currentsaldo'>
         <div className='row'>
           
             <div className='col-md-6'>
+              Boekjaar: <input className="form-control bookYear" type="text" name="bookYear" />
               Beginsaldo: <input className='form-control beginSaldo' type="text" name="beginSaldo" onChange={(e) => setNewSaldo(parseFloat(e.target.value.replace(",", ".")))} />
             </div>
 
@@ -132,50 +149,35 @@ function App() {
                 <table className='table'>
                   <thead>
                     <tr>
-                      <th>Datum</th>
-                      <th>Categorie</th>
+                      <th onClick={() => { sortOnDate('incomes', incomes) }}>Datum</th>
                       <th>Beschrijving</th>
-                      <th>Bedrag</th>
+                      <th>Code</th>
+                      <th onClick={() => { sortOnAmount('incomes', incomes) }}>Bedrag</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <td><input className='form-control' type='text' name='inkdate' id='inkdate' /></td>
-                      <td><input className='form-control' type='text' name='inkcat' id='inccat' /></td>
                       <td><input className='form-control' type='text' name='inkdesc' id='inkdesc' /></td>
+                      <td><input className='form-control' type='text' name='inkcode' id='inkcode' /></td>
                       <td><input className='form-control' type='text' name='inkmoney' id='inkmoney' /></td>
                       <td><input className='form-control' type="submit" name="submit" value="Toevoegen" /></td>
                     </tr>
+                    {incomes.map(item => {
+                      return (
+                        <tr>
+                          <td><input className='form-control' type='text' value={item.date}/></td>
+                          <td><input className='form-control' type='text' value={item.desc}/></td>
+                          <td><input className='form-control' type='text' value={item.code}/></td>
+                          <td><input className='form-control' type='text' value={item.money}/></td>
+                          <td><span className='form-control' onClick={() => deleteAmount("incomes", item.id)}>Verwijderen</span></td>
+                        </tr>
+                      )
+                  })}
                   </tbody>
                 </table>
               </form>
-
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th onClick={() => { sortOnDate('incomes', incomes) }}>Datum</th>
-                    <th>Categorie</th>
-                    <th>Beschrijving</th>
-                    <th onClick={() => { sortOnAmount('incomes', incomes) }}>Bedrag</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {incomes.map(item => {
-                    return (
-                      <tr>
-                        <td>{item.date}</td>
-                        <td>{item.category}</td>
-                        <td>{item.desc}</td>
-                        <td>{item.money}</td>
-                        <td><button>Verwijderen</button></td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-
               <div className="incTotal">Totaal inkomsten: &euro; {inctotal}</div>
             </div>
           </div>
@@ -189,8 +191,8 @@ function App() {
                   <thead>
                     <tr>
                       <th>Datum</th>
-                      <th>Categorie</th>
                       <th>Beschrijving</th>
+                      <th>Code</th>
                       <th>Bedrag</th>
                       <th></th>
                     </tr>
@@ -198,39 +200,25 @@ function App() {
                   <tbody>
                     <tr>
                       <td><input className='form-control' type='text' name='uitdate' id='uitdate' /></td>
-                      <td><input className='form-control' type='text' name='uitcat' id='uitcat' /></td>
                       <td><input className='form-control' type='text' name='uitdesc' id='uitdesc' /></td>
+                      <td><input className='form-control' type='text' name='uitcode' id='uitcode' /></td>
                       <td><input className='form-control' type='text' name='uitmoney' id='uitmoney' /></td>
                       <td><input className='form-control' type="submit" name="submit" value="Toevoegen" /></td>
                     </tr>
+                    {expanses.map(item => {
+                      return (
+                        <tr>
+                        <td><input className='form-control' type='text' name='inkdate' id='inkdate' value={item.date}/></td>
+                        <td><input className='form-control' type='text' name='inkdate' id='inkdesc' value={item.desc}/></td>
+                        <td><input className='form-control' type='text' name='inkdate' id='inkcode' value={item.code}/></td>
+                        <td><input className='form-control' type='text' name='inkdate' id='inkmoney' value={item.money}/></td>
+                        <td><span className='form-control' onClick={() => deleteAmount("expanses", item.id)}>Verwijderen</span></td>
+                      </tr>
+                      )
+                  })}
                   </tbody>
                 </table>
               </form>
-
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th onClick={() => { sortOnDate('expanses', expanses) }}>Datum</th>
-                    <th>Categorie</th>
-                    <th>Beschrijving</th>
-                    <th onClick={() => { sortOnAmount('expanses', expanses) }}>Bedrag</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {expanses.map(item => {
-                    return (
-                      <tr>
-                        <td>{item.date}</td>
-                        <td>{item.category}</td>
-                        <td>{item.desc}</td>
-                        <td>{item.money}</td>
-                        <td><button>Verwijderen</button></td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
               <div className="outTotal">Totaal uitgaven: &euro; {outtotal}</div>
             </div>
           </div>
