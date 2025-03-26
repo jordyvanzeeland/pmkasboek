@@ -49,27 +49,35 @@ function App() {
     const updateItem = typeArray.find((item) => item.id === id);
 
     const updateDate = event.target.parentNode.parentNode.children[0].children[0].value;
-    const updateCode = event.target.parentNode.parentNode.children[1].children[0].value;
     const updateDesc = event.target.parentNode.parentNode.children[2].children[0].value;
     const updateMoney = event.target.parentNode.parentNode.children[3].children[0].value;
+
+    console.log(event.target.parentNode.parentNode.children, updateMoney);
 
     if(updateItem){
       typeArray[id - 1] = {
         date: updateDate,
-        code: updateCode,
         desc: updateDesc,
-        money: updateMoney
+        money: updateMoney ? updateMoney : 0
       }
     }
 
-    if(type === 'expanses'){
-      setExpanses([...typeArray]);
-      setOuttotal((prevOuttotal) => prevOuttotal - parseFloat(updateMoney.replace(",", ".")));
-      setNewSaldo((prevSaldo) => prevSaldo - parseFloat(updateMoney.replace(",", ".")));
-    }else{
-      setIncomes([...typeArray]);
-      setInctotal((prevInctotal) => prevInctotal + parseFloat(updateMoney.replace(",", ".")));
-      setNewSaldo((prevSaldo) => prevSaldo + parseFloat(updateMoney.replace(",", ".")));
+    if(updateMoney && updateMoney != '' && updateMoney != '0'){
+      if(type === 'expanses'){
+        setExpanses([...typeArray]);
+        setOuttotal((prevOuttotal) => prevOuttotal - parseFloat(updateItem.money.replace(",", ".")));
+        setNewSaldo((prevSaldo) => prevSaldo + parseFloat(updateItem.money.replace(",", ".")));
+  
+        setOuttotal((prevOuttotal) => prevOuttotal + parseFloat(updateMoney.replace(",", ".")));
+        setNewSaldo((prevSaldo) => prevSaldo - parseFloat(updateMoney.replace(",", ".")));
+      }else{
+        setIncomes([...typeArray]);
+        setInctotal((prevInctotal) => prevInctotal - parseFloat(updateItem.money.replace(",", ".")));
+        setNewSaldo((prevSaldo) => prevSaldo - parseFloat(updateItem.money.replace(",", ".")));
+  
+        setInctotal((prevInctotal) => prevInctotal + parseFloat(updateMoney.replace(",", ".")));
+        setNewSaldo((prevSaldo) => prevSaldo + parseFloat(updateMoney.replace(",", ".")));
+      }
     }
   }, 500)
 
@@ -97,7 +105,6 @@ function App() {
     const newIncome = {
       id: incomes.length + 1,
       date: event.target.inkdate.value,
-      code: event.target.inkcode.value,
       desc: event.target.inkdesc.value,
       money: event.target.inkmoney.value
     }
@@ -115,7 +122,6 @@ function App() {
     const newExpanse = {
       id: expanses.length + 1,
       date: event.target.uitdate.value,
-      code: event.target.uitcode.value,
       desc: event.target.uitdesc.value,
       money: event.target.uitmoney.value
     }
@@ -181,7 +187,6 @@ function App() {
                     <tr>
                       <th onClick={() => { sortOnDate('incomes', incomes) }}>Datum</th>
                       <th>Beschrijving</th>
-                      <th>Code</th>
                       <th onClick={() => { sortOnAmount('incomes', incomes) }}>Bedrag</th>
                       <th></th>
                     </tr>
@@ -190,7 +195,6 @@ function App() {
                     <tr>
                       <td><input className='form-control' type='text' name='inkdate' id='inkdate' /></td>
                       <td><input className='form-control' type='text' name='inkdesc' id='inkdesc' /></td>
-                      <td><input className='form-control' type='text' name='inkcode' id='inkcode' /></td>
                       <td><input className='form-control' type='text' name='inkmoney' id='inkmoney' /></td>
                       <td><input className='form-control' type="submit" name="submit" value="Toevoegen" /></td>
                     </tr>
@@ -199,7 +203,6 @@ function App() {
                         <tr>
                           <td><input id={`incdate-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 'incomes', item.id)} className='form-control' type='text' value={item.date}/></td>
                           <td><input id={`incdesc-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 'incomes', item.id)}  className='form-control' type='text' value={item.desc}/></td>
-                          <td><input id={`inccode-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 'incomes', item.id)}  className='form-control' type='text' value={item.code}/></td>
                           <td><input id={`incmoney-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 'incomes', item.id)} className='form-control' type='text' defaultValue={item.money}/></td>
                           <td><span className='form-control' onClick={() => deleteAmount("incomes", item.id)}>Verwijderen</span></td>
                         </tr>
@@ -221,7 +224,6 @@ function App() {
                     <tr>
                       <th>Datum</th>
                       <th>Beschrijving</th>
-                      <th>Code</th>
                       <th>Bedrag</th>
                       <th></th>
                     </tr>
@@ -230,17 +232,15 @@ function App() {
                     <tr>
                       <td><input className='form-control' type='text' name='uitdate' id='uitdate' /></td>
                       <td><input className='form-control' type='text' name='uitdesc' id='uitdesc' /></td>
-                      <td><input className='form-control' type='text' name='uitcode' id='uitcode' /></td>
                       <td><input className='form-control' type='text' name='uitmoney' id='uitmoney' /></td>
                       <td><input className='form-control' type="submit" name="submit" value="Toevoegen" /></td>
                     </tr>
                     {expanses.map(item => {
                       return (
                         <tr>
-                        <td><input className='form-control' type='text' name='outdate' id={`outdate-${item.id}`} data-id={item.id} value={item.date}/></td>
-                        <td><input className='form-control' type='text' name='outdesc' id={`outdesc-${item.id}`} data-id={item.id} value={item.desc}/></td>
-                        <td><input className='form-control' type='text' name='outcode' id={`outcode-${item.id}`} data-id={item.id} value={item.code}/></td>
-                        <td><input className='form-control' type='text' name='outmoney' id={`outmoney-${item.id}`} data-id={item.id} defaultValue={item.money}/></td>
+                        <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdate-${item.id}`} data-id={item.id} value={item.date}/></td>
+                        <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdesc-${item.id}`} data-id={item.id} value={item.desc}/></td>
+                        <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outmoney-${item.id}`} data-id={item.id} defaultValue={item.money}/></td>
                         <td><span className='form-control' onClick={() => deleteAmount("expanses", item.id)}>Verwijderen</span></td>
                       </tr>
                       )
