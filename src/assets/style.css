@@ -69,3 +69,7 @@ html, body{
 .form-control{
     border: solid 1px #bbb !important;
 }
+
+.btn-delete{
+    text-align: center;
+}

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { debounce } from "lodash";
 import "./assets/style.css";
+import moment from 'moment';
+moment.locale('nl');
 
 function App() {
   const [newSaldo, setNewSaldo] = useState(0);
@@ -11,6 +13,14 @@ function App() {
   const [inctotal, setInctotal] = useState(0);
   const [outtotal, setOuttotal] = useState(0);
   const [selectedMonth, setSelectedMonth] = useState(0);
+
+  const formats = ["DD-MM-YYYY", "YYYY-MM-DD"];
+
+  const filteredIncomes = incomes.filter(income => moment(income.date, formats, true).month() + 1 === selectedMonth);
+  const filteredExpanses = expanses.filter(expanse => moment(expanse.date, formats, true).month() + 1 === selectedMonth);
+
+  const filteredinctotal = filteredIncomes.reduce((total, income) => total + parseFloat(income.money.replace(",", ".")), 0);
+  const filteredouttotal = filteredExpanses.reduce((total, expanse) => total + parseFloat(expanse.money.replace(",", ".")), 0);
 
   const sortOnDate = (type, list) => {
     let sortedList = [...list].sort((a, b) => {
@@ -142,7 +152,7 @@ function App() {
       <div className="container-fluid">
         <div className='months'>
           <ul>
-            <li onClick={() => setSelectedMonth(1)} className={selectedMonth === 1 ? "active" : ''} value="1">Januari</li>
+            {/* <li onClick={() => setSelectedMonth(1)} className={selectedMonth === 1 ? "active" : ''} value="1">Januari</li>
             <li onClick={() => setSelectedMonth(2)} className={selectedMonth === 2 ? "active" : ''} value="2">Februari</li>
             <li onClick={() => setSelectedMonth(3)} className={selectedMonth === 3 ? "active" : ''} value="3">Maart</li>
             <li onClick={() => setSelectedMonth(4)} className={selectedMonth === 4 ? "active" : ''} value="4">April</li>
@@ -153,7 +163,15 @@ function App() {
             <li onClick={() => setSelectedMonth(9)} className={selectedMonth === 9 ? "active" : ''} value="9">September</li>
             <li onClick={() => setSelectedMonth(10)} className={selectedMonth === 10 ? "active" : ''} value="10">Oktober</li>
             <li onClick={() => setSelectedMonth(11)} className={selectedMonth === 11 ? "active" : ''} value="11">November</li>
-            <li onClick={() => setSelectedMonth(12)} className={selectedMonth === 12 ? "active" : ''} value="12">December</li>
+            <li onClick={() => setSelectedMonth(12)} className={selectedMonth === 12 ? "active" : ''} value="12">December</li> */}
+            {[...Array(12)].map((_, index) => {
+              const month = index + 1;
+              return (
+                <li key={month} onClick={() => setSelectedMonth(month)} className={selectedMonth === month ? "active" : ''}>
+                  {new Date(0, month - 1).toLocaleString('default', { month: 'long' })}
+                </li>
+              );
+            })}
           </ul>
         </div>
 
@@ -179,7 +197,7 @@ function App() {
         <div className='row'>
           <div className='col-md-6'>
             <div className='inkomsten'>
-              <h3>Inkomsten <span style={{ float: "right" }}>Totaal: &euro; {inctotal}</span></h3>
+              <h3>Inkomsten <span style={{ float: "right" }}>Totaal: &euro; {filteredinctotal}</span></h3>
 
               <form method="POST" onSubmit={(event) => addIncome(event)}>
                 <table className='table'>
@@ -198,13 +216,13 @@ function App() {
                       <td><input className='form-control' type='text' name='inkmoney' id='inkmoney' /></td>
                       <td><input className='form-control' type="submit" name="submit" value="Toevoegen" /></td>
                     </tr>
-                    {incomes.map(item => {
+                    {filteredIncomes.map(item => {
                       return (
                         <tr>
                           <td><input id={`incdate-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 'incomes', item.id)} className='form-control' type='text' value={item.date}/></td>
                           <td><input id={`incdesc-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 'incomes', item.id)}  className='form-control' type='text' value={item.desc}/></td>
                           <td><input id={`incmoney-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 'incomes', item.id)} className='form-control' type='text' defaultValue={item.money}/></td>
-                          <td><span className='form-control' onClick={() => deleteAmount("incomes", item.id)}>Verwijderen</span></td>
+                          <td><span className='form-control btn-delete' onClick={() => deleteAmount("incomes", item.id)}>Verwijderen</span></td>
                         </tr>
                       )
                   })}
@@ -216,7 +234,7 @@ function App() {
 
           <div className='col-md-6'>
             <div className='uitgaven'>
-              <h3>Uitgaven <span style={{ float: "right" }}>Totaal: &euro; {outtotal}</span></h3>
+              <h3>Uitgaven <span style={{ float: "right" }}>Totaal: &euro; {filteredouttotal}</span></h3>
 
               <form method="POST" onSubmit={(event) => addExpanse(event)}>
                 <table className='table'>
@@ -235,13 +253,13 @@ function App() {
                       <td><input className='form-control' type='text' name='uitmoney' id='uitmoney' /></td>
                       <td><input className='form-control' type="submit" name="submit" value="Toevoegen" /></td>
                     </tr>
-                    {expanses.map(item => {
+                    {filteredExpanses.map(item => {
                       return (
                         <tr>
                         <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdate-${item.id}`} data-id={item.id} value={item.date}/></td>
                         <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdesc-${item.id}`} data-id={item.id} value={item.desc}/></td>
                         <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outmoney-${item.id}`} data-id={item.id} defaultValue={item.money}/></td>
-                        <td><span className='form-control' onClick={() => deleteAmount("expanses", item.id)}>Verwijderen</span></td>
+                        <td><span className='form-control btn-delete' onClick={() => deleteAmount("expanses", item.id)}>Verwijderen</span></td>
                       </tr>
                       )
                   })}
