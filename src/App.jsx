@@ -59,10 +59,8 @@ function App() {
     const updateItem = typeArray.find((item) => item.id === id);
 
     const updateDate = event.target.parentNode.parentNode.children[0].children[0].value;
-    const updateDesc = event.target.parentNode.parentNode.children[2].children[0].value;
-    const updateMoney = event.target.parentNode.parentNode.children[3].children[0].value;
-
-    console.log(event.target.parentNode.parentNode.children, updateMoney);
+    const updateDesc = event.target.parentNode.parentNode.children[1].children[0].value;
+    const updateMoney = event.target.parentNode.parentNode.children[2].children[0].value;
 
     if(updateItem){
       typeArray[id - 1] = {
@@ -75,17 +73,11 @@ function App() {
     if(updateMoney && updateMoney != '' && updateMoney != '0'){
       if(type === 'expanses'){
         setExpanses([...typeArray]);
-        setOuttotal((prevOuttotal) => prevOuttotal - parseFloat(updateItem.money.replace(",", ".")));
         setNewSaldo((prevSaldo) => prevSaldo + parseFloat(updateItem.money.replace(",", ".")));
-  
-        setOuttotal((prevOuttotal) => prevOuttotal + parseFloat(updateMoney.replace(",", ".")));
         setNewSaldo((prevSaldo) => prevSaldo - parseFloat(updateMoney.replace(",", ".")));
       }else{
         setIncomes([...typeArray]);
-        setInctotal((prevInctotal) => prevInctotal - parseFloat(updateItem.money.replace(",", ".")));
         setNewSaldo((prevSaldo) => prevSaldo - parseFloat(updateItem.money.replace(",", ".")));
-  
-        setInctotal((prevInctotal) => prevInctotal + parseFloat(updateMoney.replace(",", ".")));
         setNewSaldo((prevSaldo) => prevSaldo + parseFloat(updateMoney.replace(",", ".")));
       }
     }
@@ -152,23 +144,14 @@ function App() {
       <div className="container-fluid">
         <div className='months'>
           <ul>
-            {/* <li onClick={() => setSelectedMonth(1)} className={selectedMonth === 1 ? "active" : ''} value="1">Januari</li>
-            <li onClick={() => setSelectedMonth(2)} className={selectedMonth === 2 ? "active" : ''} value="2">Februari</li>
-            <li onClick={() => setSelectedMonth(3)} className={selectedMonth === 3 ? "active" : ''} value="3">Maart</li>
-            <li onClick={() => setSelectedMonth(4)} className={selectedMonth === 4 ? "active" : ''} value="4">April</li>
-            <li onClick={() => setSelectedMonth(5)} className={selectedMonth === 5 ? "active" : ''} value="5">Mei</li>
-            <li onClick={() => setSelectedMonth(6)} className={selectedMonth === 6 ? "active" : ''} value="6">Juni</li>
-            <li onClick={() => setSelectedMonth(7)} className={selectedMonth === 7 ? "active" : ''} value="7">Juli</li>
-            <li onClick={() => setSelectedMonth(8)} className={selectedMonth === 8 ? "active" : ''} value="8">Augustus</li>
-            <li onClick={() => setSelectedMonth(9)} className={selectedMonth === 9 ? "active" : ''} value="9">September</li>
-            <li onClick={() => setSelectedMonth(10)} className={selectedMonth === 10 ? "active" : ''} value="10">Oktober</li>
-            <li onClick={() => setSelectedMonth(11)} className={selectedMonth === 11 ? "active" : ''} value="11">November</li>
-            <li onClick={() => setSelectedMonth(12)} className={selectedMonth === 12 ? "active" : ''} value="12">December</li> */}
             {[...Array(12)].map((_, index) => {
               const month = index + 1;
+              const monthName = new Date(0, month - 1).toLocaleString('default', { month: 'long' });
+              const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
               return (
                 <li key={month} onClick={() => setSelectedMonth(month)} className={selectedMonth === month ? "active" : ''}>
-                  {new Date(0, month - 1).toLocaleString('default', { month: 'long' })}
+                  {capitalizedMonth}
                 </li>
               );
             })}
