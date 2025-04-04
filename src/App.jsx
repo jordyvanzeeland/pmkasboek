@@ -6,6 +6,9 @@ moment.locale('nl');
 
 function App() {
   const [newSaldo, setNewSaldo] = useState(0);
+  const [beginSaldo, setBeginSaldo] = useState(0);
+  const [beginMonth, setBeginMonth] = useState(0);
+  const [monthlySaldo, setMonthlySaldo] = useState(Array(12).fill(0));
   const [incomes, setIncomes] = useState([]);
   const [expanses, setExpanses] = useState([]);
   const [isSortedDateAsc, setIsSortedDateAsc] = useState(true);
@@ -73,12 +76,10 @@ function App() {
     if(updateMoney && updateMoney != '' && updateMoney != '0'){
       if(type === 'expanses'){
         setExpanses([...typeArray]);
-        setNewSaldo((prevSaldo) => prevSaldo + parseFloat(updateItem.money.replace(",", ".")));
-        setNewSaldo((prevSaldo) => prevSaldo - parseFloat(updateMoney.replace(",", ".")));
+        setOuttotal((prevOuttotal) => prevOuttotal - parseFloat(updateMoney.replace(",", ".")));
       }else{
         setIncomes([...typeArray]);
-        setNewSaldo((prevSaldo) => prevSaldo - parseFloat(updateItem.money.replace(",", ".")));
-        setNewSaldo((prevSaldo) => prevSaldo + parseFloat(updateMoney.replace(",", ".")));
+        setInctotal((prevInctotal) => prevInctotal + parseFloat(updateMoney.replace(",", ".")));
       }
     }
   }, 500)
@@ -92,11 +93,9 @@ function App() {
       if(type === 'expanses'){
         setExpanses(updatedArray);
         setOuttotal((prevOuttotal) => prevOuttotal - parseFloat(deletedItem.money.replace(",", ".")));
-        setNewSaldo((prevSaldo) => prevSaldo + parseFloat(deletedItem.money.replace(",", ".")));
       }else{
         setIncomes(updatedArray);
         setInctotal((prevInctotal) => prevInctotal - parseFloat(deletedItem.money.replace(",", ".")));
-        setNewSaldo((prevSaldo) => prevSaldo - parseFloat(deletedItem.money.replace(",", ".")));
       }  
     }
   }
@@ -115,7 +114,6 @@ function App() {
     event.target.reset();
 
     setInctotal((prevInctotal) => prevInctotal + parseFloat(newIncome.money.replace(",", ".")));
-    setNewSaldo((prevSaldo) => prevSaldo + parseFloat(newIncome.money.replace(",", ".")));
   }
 
   const addExpanse = (event) => {
@@ -128,16 +126,45 @@ function App() {
       money: event.target.uitmoney.value
     }
 
-    if (newSaldo - parseFloat(newExpanse.money) >= 0) {
+    const currentMonthSaldo = monthlySaldo[selectedMonth - 1] || 0;
+    const expenseAmount = parseFloat(newExpanse.money.replace(",", "."));
+
+    if (currentMonthSaldo - expenseAmount >= 0) {
       setExpanses((prevExpanses) => [...prevExpanses, newExpanse]);
       event.target.reset();
 
       setOuttotal((prevOuttotal) => prevOuttotal + parseFloat(newExpanse.money.replace(",", ".")));
-      setNewSaldo((prevSaldo) => prevSaldo - parseFloat(newExpanse.money.replace(",", ".")));
     } else {
       alert('Saldo wordt negatief. Kan deze uitgave niet toevoegen.')
     }
   }
+
+  useEffect(() => {
+    if(!selectedMonth){
+      setSelectedMonth(1);
+    }
+
+    const newSaldos = Array(12).fill(0);
+    let runningSaldo = 0;
+
+    for (let month = 0; month < 12; month++) {
+      const monthIncomes = incomes.filter(income => moment(income.date, formats, true).month() === month);
+      const monthExpanses = expanses.filter(expanse => moment(expanse.date, formats, true).month() === month);
+
+      const incomeTotal = monthIncomes.reduce((total, income) => total + parseFloat(income.money.replace(",", ".")), 0);
+      const expanseTotal = monthExpanses.reduce((total, expanse) => total + parseFloat(expanse.money.replace(",", ".")), 0);
+
+      if (month === beginMonth) {
+        runningSaldo = beginSaldo + incomeTotal - expanseTotal;
+      } else if (month > beginMonth) {
+        runningSaldo += incomeTotal - expanseTotal;
+      }
+
+      newSaldos[month] = runningSaldo;
+    }
+
+    setMonthlySaldo([...newSaldos]);
+  }, [incomes, expanses, beginSaldo, selectedMonth])
 
   return (
     <React.Fragment>
@@ -167,11 +194,11 @@ function App() {
           
             <div className='col-md-6'>
               Boekjaar: <input className="form-control bookYear" type="text" name="bookYear" />
-              Beginsaldo: <input className='form-control beginSaldo' type="text" name="beginSaldo" onChange={(e) => setNewSaldo(parseFloat(e.target.value.replace(",", ".")))} />
+              Beginsaldo: <input className='form-control beginSaldo' type="text" name="beginSaldo" onChange={(e) => setBeginSaldo(parseFloat(e.target.value.replace(",", ".")))} />
             </div>
 
             <div className='col-md-6'>
-              <div className='saldo'>Totaal saldo: &euro; {newSaldo.toString().replace(".", ",")}</div>
+              <div className='saldo'>Totaal saldo: &euro; {monthlySaldo[selectedMonth - 1]?.toFixed(2).replace(".", ",")}</div>
             </div>
           </div>
         </div>
