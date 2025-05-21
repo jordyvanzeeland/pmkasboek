@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { jwtDecode } from 'jwt-decode';
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 export default function withAuth(AuthComponent){
     
     const AuthWrapped = (props) => {
         const [user, setUser] = useState([]);
         const token = localStorage.getItem('token');
+
+        let location = useLocation();
+        let navigate = useNavigate();
+        let params = useParams();
     
         const isTokenExpired = (token) => {
             if (!token) {
@@ -30,7 +35,7 @@ export default function withAuth(AuthComponent){
             }
         })
     
-        return <AuthComponent history={props.history} />
+        return <AuthComponent {...props} router={( location, navigate, params )}/>
     }
 
     return AuthWrapped;
