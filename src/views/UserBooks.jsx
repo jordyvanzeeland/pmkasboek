@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
-import { getUserSaldos } from '../data/Saldos';
+import { getUserSaldos, insertUserSaldos } from '../data/Saldos';
 import '../assets/style.css';
 import withAuth from '../components/withAuth';
+import { useNavigate } from 'react-router-dom';
 
 moment.locale('nl');
 
 function UserBooks() {
     const [userbooks, setUserbooks] = useState([]);
+    const navigate = useNavigate();
+    const currentYear = new Date().getFullYear();
+
+    const newBook = async () => {
+        try {
+            await insertUserSaldos(currentYear);
+            navigate(`/kasboek/${currentYear}`);
+        } catch (error) {
+            console.error("Error creating user books:", error);
+        }
+    }
 
     useEffect(() => {
         const fetchUserBooks = async () => {
@@ -23,6 +35,7 @@ function UserBooks() {
 
     return (
         <div>
+            <button onClick={() => newBook() }className='btn btn-new'>Nieuw kasboek</button>
             <h1>Gebruiker kasboeken</h1>
             <table id="DataTable" className="display" width="100%">
                 <thead>

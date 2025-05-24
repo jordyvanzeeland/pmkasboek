@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { debounce } from "lodash";
 import "../assets/style.css";
 import moment from 'moment';
-import { getUserAmounts } from '../data/Amounts';
+import { getUserAmounts, updateUserAmount, deleteUserAmount, insertUserAmount } from '../data/Amounts';
 import withAuth from '../components/withAuth';
 moment.locale('nl');
 
@@ -20,8 +20,6 @@ const Kasboek = (props) => {
   const [expanses, setExpanses] = useState([]);
   const [isSortedDateAsc, setIsSortedDateAsc] = useState(true);
   const [isSortedAmountAsc, setIsSortedAmountAsc] = useState(true);
-  const [inctotal, setInctotal] = useState(0);
-  const [outtotal, setOuttotal] = useState(0);
   const [selectedMonth, setSelectedMonth] = useState(1);
 
   const parseAmount = (value) => {
@@ -34,14 +32,11 @@ const Kasboek = (props) => {
   };
 
   const formats = ["DD-MM-YYYY", "YYYY-MM-DD"];
-
   const filteredIncomes = useramounts.incomes.filter(income => moment(income.date, formats, true).month() + 1 === selectedMonth);
   const filteredExpanses = useramounts.expanses.filter(expanse => moment(expanse.date, formats, true).month() + 1 === selectedMonth);
 
   const filteredinctotal = filteredIncomes.reduce((total, income) => total + parseAmount(income.amount), 0);
   const filteredouttotal = filteredExpanses.reduce((total, expanse) => total + parseAmount(expanse.amount), 0);
-
-  
 
   const sortOnDate = (type, list) => {
     let sortedList = [...list].sort((a, b) => {
@@ -75,91 +70,38 @@ const Kasboek = (props) => {
     return sortedList;
   }
 
-  const updateRow = debounce((event, type, id) => {
-    const typeArray = type === "expanses" ? expanses : incomes;
-    const updateItem = typeArray.find((item) => item.id === id);
-
+  const updateRow = debounce(async (event, type, id) => {
     const updateDate = event.target.parentNode.parentNode.children[0].children[0].value;
     const updateDesc = event.target.parentNode.parentNode.children[1].children[0].value;
     const updateMoney = event.target.parentNode.parentNode.children[2].children[0].value;
+    const parsedMoney = parseFloat(updateMoney.replace(",", ".")) || 0;
 
-    if(updateItem){
-      typeArray[id - 1] = {
-        date: updateDate,
-        desc: updateDesc,
-        money: updateMoney ? updateMoney : 0
-      }
-    }
-
-    if(updateMoney && updateMoney != '' && updateMoney != '0'){
-      if(type === 'expanses'){
-        setExpanses([...typeArray]);
-        setOuttotal((prevOuttotal) => prevOuttotal - parseFloat(updateMoney.replace(",", ".")));
-      }else{
-        setIncomes([...typeArray]);
-        setInctotal((prevInctotal) => prevInctotal + parseFloat(updateMoney.replace(",", ".")));
-      }
-    }
+    await updateUserAmount(id, updateDate, updateDesc, parsedMoney, type);
+    await getData(props.router.bookid);
   }, 500)
 
-  const deleteAmount = (type, id) => {
-    const typeArray = type === "expanses" ? expanses : incomes;
-    const updatedArray = typeArray.filter((item) => item.id !== id);
-    const deletedItem = typeArray.find((item) => item.id === id);
-
-    if (deletedItem) {
-      if(type === 'expanses'){
-        setExpanses(updatedArray);
-        setOuttotal((prevOuttotal) => prevOuttotal - parseFloat(deletedItem.money.replace(",", ".")));
-      }else{
-        setIncomes(updatedArray);
-        setInctotal((prevInctotal) => prevInctotal - parseFloat(deletedItem.money.replace(",", ".")));
-      }  
-    }
+  const deleteAmount = async (type, id) => {
+    await deleteUserAmount(id);
+    await getData(props.router.bookid);
   }
 
-  const addIncome = (event) => {
+  const addAmount = async(event, type) => {
     event.preventDefault();
+    const insertDate = type === 1 ? event.target.inkdate.value: event.target.uitdate.value;
+    const insertDesc = type === 1 ? event.target.inkdesc.value: event.target.uitdesc.value;
+    const insertAmount = type === 1 ? event.target.inkmoney.value: event.target.uitmoney.value;
+    const bookid = props.router.bookid;
+    const parsedAmount = parseFloat(insertAmount.replace(",", ".")) || 0;
 
-    const newIncome = {
-      id: incomes.length + 1,
-      date: event.target.inkdate.value,
-      desc: event.target.inkdesc.value,
-      money: event.target.inkmoney.value
-    }
+    await insertUserAmount(insertDate, insertDesc, parsedAmount, type, bookid);
 
-    setIncomes((prevIncomes) => [...prevIncomes, newIncome]);
     event.target.reset();
-
-    setInctotal((prevInctotal) => prevInctotal + parseFloat(newIncome.money.replace(",", ".")));
+    await getData(props.router.bookid);
   }
 
-  const addExpanse = (event) => {
-    event.preventDefault();
-
-    const newExpanse = {
-      id: expanses.length + 1,
-      date: event.target.uitdate.value,
-      desc: event.target.uitdesc.value,
-      money: event.target.uitmoney.value
-    }
-
-    const currentMonthSaldo = monthlySaldo[selectedMonth - 1] || 0;
-    const expenseAmount = parseFloat(newExpanse.money.replace(",", "."));
-
-    if (currentMonthSaldo - expenseAmount >= 0) {
-      setExpanses((prevExpanses) => [...prevExpanses, newExpanse]);
-      event.target.reset();
-
-      setOuttotal((prevOuttotal) => prevOuttotal + parseFloat(newExpanse.money.replace(",", ".")));
-    } else {
-      alert('Saldo wordt negatief. Kan deze uitgave niet toevoegen.')
-    }
-  }
-
-  const getBookYearAmounts = async(year) => {
+  const getBookYearAmounts = async(bookid) => {
     try {
-      const amounts = await getUserAmounts();
+      const amounts = await getUserAmounts(bookid);
       setUseramounts({
         incomes: amounts.filter(amount => amount.type.id === 1),
         expanses: amounts.filter(amount => amount.type.id === 2)
@@ -169,11 +111,15 @@ const Kasboek = (props) => {
     }
   }
 
-  useEffect(() => {
-    if (props.router.year) {
-      getBookYearAmounts(props.router.year);
+  const getData = async () => {
+    if (props.router.bookid) {
+      getBookYearAmounts(props.router.bookid);
     }
-  }, [props.router.year]);
+  }
+
+  useEffect(() => {
+    getData();
+  }, [props.router.bookid]);
 
   useEffect(() => {
     if (!useramounts?.incomes || !useramounts?.expanses) return;
@@ -185,8 +131,10 @@ const Kasboek = (props) => {
       const monthIncomes = useramounts.incomes.filter(amount => moment(amount.date, formats, true).month() === month);
       const monthExpanses = useramounts.expanses.filter(amount => moment(amount.date, formats, true).month() === month);
   
-      const incomeTotal = monthIncomes.reduce((total, income) => total + parseFloat(income.amount.replace(",", ".")),0);
-      const expanseTotal = monthExpanses.reduce((total, expanse) => total + parseFloat(expanse.amount.replace(",", ".")),0);
+      const incomeTotal = monthIncomes.reduce((total, income) => total + parseAmount(income.amount) ,0);
+      const expanseTotal = monthExpanses.reduce((total, expanse) => total + parseAmount(expanse.amount), 0);
+
+      console.log(incomeTotal, expanseTotal);
   
       if (month === beginMonth) {
         runningSaldo = beginSaldo + incomeTotal - expanseTotal;
@@ -243,7 +191,7 @@ const Kasboek = (props) => {
             <div className='inkomsten'>
               <h3>Inkomsten <span style={{ float: "right" }}>Totaal: &euro; {filteredinctotal}</span></h3>
 
-              <form method="POST" onSubmit={(event) => addIncome(event)}>
+              <form method="POST" onSubmit={(event) => addAmount(event, 1)}>
                 <table className='table'>
                   <thead>
                     <tr>
@@ -263,9 +211,9 @@ const Kasboek = (props) => {
                     {filteredIncomes.map(item => {
                       return (
                         <tr>
-                          <td><input id={`incdate-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 'incomes', item.id)} className='form-control' type='text' value={item.date}/></td>
-                          <td><input id={`incdesc-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 'incomes', item.id)}  className='form-control' type='text' value={item.description}/></td>
-                          <td><input id={`incmoney-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 'incomes', item.id)} className='form-control' type='text' defaultValue={item.amount}/></td>
+                          <td><input id={`incdate-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 1, item.id)} className='form-control' type='text' defaultValue={item.date}/></td>
+                          <td><input id={`incdesc-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 1, item.id)}  className='form-control' type='text' defaultValue={item.description}/></td>
+                          <td><input id={`incmoney-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 1, item.id)} className='form-control' type='text' defaultValue={item.amount}/></td>
                           <td><span className='form-control btn-delete' onClick={() => deleteAmount("incomes", item.id)}>Verwijderen</span></td>
                         </tr>
                       )
@@ -280,7 +228,7 @@ const Kasboek = (props) => {
             <div className='uitgaven'>
               <h3>Uitgaven <span style={{ float: "right" }}>Totaal: &euro; {filteredouttotal}</span></h3>
 
-              <form method="POST" onSubmit={(event) => addExpanse(event)}>
+              <form method="POST" onSubmit={(event) => addAmount(event, 2)}>
                 <table className='table'>
                   <thead>
                     <tr>

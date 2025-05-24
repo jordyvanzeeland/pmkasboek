@@ -10,7 +10,7 @@ function App() {
       <Routes>
           <Route exact path="/" element={localStorage.getItem('token') ? <UserBooks /> : <Login />} />
           <Route exact path="/kasboek" element={<Kasboek />} />
-          <Route exact path="/kasboek/:year" element={<Kasboek />} />
+          <Route exact path="/kasboek/:bookid" element={<Kasboek />} />
       </Routes>
     </Router>
   )
