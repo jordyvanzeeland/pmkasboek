@@ -3,12 +3,13 @@ import { debounce } from "lodash";
 import "../assets/style.css";
 import moment from 'moment';
 import { getUserAmounts, updateUserAmount, deleteUserAmount, insertUserAmount } from '../data/Amounts';
+import { getUserSaldo } from '../data/Saldos';
 import withAuth from '../components/withAuth';
 moment.locale('nl');
 
 const Kasboek = (props) => {
-  const [newSaldo, setNewSaldo] = useState(0);
   const [beginSaldo, setBeginSaldo] = useState(0);
+  const [currentBook, setCurrentBook] = useState([]);
   const [beginMonth, setBeginMonth] = useState(0);
   const [monthlySaldo, setMonthlySaldo] = useState(Array(12).fill(0));
   const [useramounts, setUseramounts] = useState({
@@ -117,13 +118,20 @@ const Kasboek = (props) => {
     }
   }
 
+  const getCurrentBook = async () => {
+    if (props.router.bookid) {
+      const bookSaldo = await getUserSaldo(props.router.bookid);
+      setBeginSaldo(bookSaldo.startsaldo);
+      setCurrentBook(bookSaldo);
+    }
+  }
+
   useEffect(() => {
+    getCurrentBook();
     getData();
   }, [props.router.bookid]);
 
   useEffect(() => {
-    if (!useramounts?.incomes || !useramounts?.expanses) return;
-  
     const newSaldos = Array(12).fill(0);
     let runningSaldo = 0;
   
@@ -133,8 +141,6 @@ const Kasboek = (props) => {
   
       const incomeTotal = monthIncomes.reduce((total, income) => total + parseAmount(income.amount) ,0);
       const expanseTotal = monthExpanses.reduce((total, expanse) => total + parseAmount(expanse.amount), 0);
-
-      console.log(incomeTotal, expanseTotal);
   
       if (month === beginMonth) {
         runningSaldo = beginSaldo + incomeTotal - expanseTotal;
@@ -175,8 +181,8 @@ const Kasboek = (props) => {
         <div className='row'>
           
             <div className='col-md-6'>
-              Boekjaar: <input className="form-control bookYear" type="text" name="bookYear" />
-              Beginsaldo: <input className='form-control beginSaldo' type="text" name="beginSaldo" onChange={(e) => setBeginSaldo(parseFloat(e.target.value.replace(",", ".")))} />
+              Boekjaar: <input className="form-control bookYear" type="text" name="bookYear" defaultValue={currentBook.bookyear} />
+              Beginsaldo: <input className='form-control beginSaldo' type="text" name="beginSaldo" defaultValue={currentBook.startsaldo} onChange={(e) => setBeginSaldo(parseFloat(e.target.value.replace(",", ".")))} />
             </div>
 
             <div className='col-md-6'>
@@ -247,7 +253,7 @@ const Kasboek = (props) => {
                     </tr>
                     {filteredExpanses.map(item => {
                       return (
-                        <tr>
+                        <tr key={item.id}>
                         <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdate-${item.id}`} data-id={item.id} defaultValue={item.date}/></td>
                         <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdesc-${item.id}`} data-id={item.id} defaultValue={item.description}/></td>
                         <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outmoney-${item.id}`} data-id={item.id} defaultValue={item.amount}/></td>

@@ -1,5 +1,19 @@
-export const getUserSaldos = async (year) => {
+export const getUserSaldos = async () => {
     return await fetch(`http://localhost:8000/api/saldos`, {
+        method: 'GET',
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem('token')}`,
+            "Accept": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        return data;
+    })
+}
+
+export const getUserSaldo = async (saldoid) => {
+    return await fetch(`http://localhost:8000/api/saldos/${saldoid}`, {
         method: 'GET',
         headers: {
             "Authorization": `Bearer ${localStorage.getItem('token')}`,
