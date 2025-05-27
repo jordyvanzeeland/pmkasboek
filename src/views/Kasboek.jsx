@@ -56,8 +56,8 @@ const Kasboek = (props) => {
 
   const sortOnAmount = (type, list) => {
     let sortedList = [...list].sort((a, b) => {
-      return isSortedAmountAsc ? a.money - b.money : b.money - a.money;
-    }).reverse();
+      return isSortedAmountAsc ? parseAmount(a.amount) - parseAmount(b.amount) : parseAmount(b.amount) - parseAmount(a.amount);
+    })
 
     if (type === 'expanses') {
       setExpanses(sortedList);
@@ -146,7 +146,7 @@ const Kasboek = (props) => {
     }
   
     setMonthlySaldo([...newSaldos]);
-  }, []);
+  }, [useramounts, beginSaldo, beginMonth]);
 
   return (
     <React.Fragment>
@@ -210,7 +210,7 @@ const Kasboek = (props) => {
                     </tr>
                     {filteredIncomes.map(item => {
                       return (
-                        <tr>
+                        <tr key={item.id}>
                           <td><input id={`incdate-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 1, item.id)} className='form-control' type='text' defaultValue={item.date}/></td>
                           <td><input id={`incdesc-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 1, item.id)}  className='form-control' type='text' defaultValue={item.description}/></td>
                           <td><input id={`incmoney-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 1, item.id)} className='form-control' type='text' defaultValue={item.amount}/></td>
@@ -248,8 +248,8 @@ const Kasboek = (props) => {
                     {filteredExpanses.map(item => {
                       return (
                         <tr>
-                        <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdate-${item.id}`} data-id={item.id} value={item.date}/></td>
-                        <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdesc-${item.id}`} data-id={item.id} value={item.description}/></td>
+                        <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdate-${item.id}`} data-id={item.id} defaultValue={item.date}/></td>
+                        <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdesc-${item.id}`} data-id={item.id} defaultValue={item.description}/></td>
                         <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outmoney-${item.id}`} data-id={item.id} defaultValue={item.amount}/></td>
                         <td><span className='form-control btn-delete' onClick={() => deleteAmount("expanses", item.id)}>Verwijderen</span></td>
                       </tr>
