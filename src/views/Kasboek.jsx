@@ -5,6 +5,7 @@ import moment from 'moment';
 import { getUserAmounts, updateUserAmount, deleteUserAmount, insertUserAmount } from '../data/Amounts';
 import { getUserSaldo } from '../data/Saldos';
 import withAuth from '../components/withAuth';
+import Header from '../components/header';
 moment.locale('nl');
 
 const Kasboek = (props) => {
@@ -156,7 +157,22 @@ const Kasboek = (props) => {
 
   return (
     <React.Fragment>
+      <Header />
       <div className="container-fluid">
+      <div className='currentsaldo'>
+        <div className='row'>
+          
+            <div className='col-md-6'>
+              Boekjaar: <input className="form-control bookYear" type="text" name="bookYear" defaultValue={currentBook.bookyear} />
+              Beginsaldo: <input className='form-control beginSaldo' type="text" name="beginSaldo" defaultValue={currentBook.startsaldo} onChange={(e) => setBeginSaldo(parseFloat(e.target.value.replace(",", ".")))} />
+            </div>
+
+            <div className='col-md-6'>
+              <div className='saldo'>Totaal saldo: &euro; {monthlySaldo[selectedMonth - 1]?.toFixed(2).replace(".", ",")}</div>
+            </div>
+          </div>
+        </div>
+
         <div className='months'>
           <ul>
             {[...Array(12)].map((_, index) => {
@@ -171,26 +187,7 @@ const Kasboek = (props) => {
               );
             })}
           </ul>
-        </div>
-
-        <div className="logo">
-          <span>PM</span>Kasboek
-        </div>
-
-        <div className='currentsaldo'>
-        <div className='row'>
-          
-            <div className='col-md-6'>
-              Boekjaar: <input className="form-control bookYear" type="text" name="bookYear" defaultValue={currentBook.bookyear} />
-              Beginsaldo: <input className='form-control beginSaldo' type="text" name="beginSaldo" defaultValue={currentBook.startsaldo} onChange={(e) => setBeginSaldo(parseFloat(e.target.value.replace(",", ".")))} />
-            </div>
-
-            <div className='col-md-6'>
-              <div className='saldo'>Totaal saldo: &euro; {monthlySaldo[selectedMonth - 1]?.toFixed(2).replace(".", ",")}</div>
-            </div>
-          </div>
-        </div>
-
+        </div>    
 
         <div className='row'>
           <div className='col-md-6'>

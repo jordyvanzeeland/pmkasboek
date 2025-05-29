@@ -31,7 +31,7 @@ export default function withAuth(AuthComponent){
             
             if (tokenExpired) {
                 localStorage.clear();
-                window.location.reload();
+                window.location.href = "/login";
             }
         })
     

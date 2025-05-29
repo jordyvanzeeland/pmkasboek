@@ -4,6 +4,7 @@ import { getUserSaldos, insertUserSaldos } from '../data/Saldos';
 import '../assets/style.css';
 import withAuth from '../components/withAuth';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/header';
 
 moment.locale('nl');
 
@@ -34,10 +35,12 @@ function UserBooks() {
     }, []);
 
     return (
-        <div>
-            <button onClick={() => newBook() }className='btn btn-new'>Nieuw kasboek</button>
-            <h1>Gebruiker kasboeken</h1>
-            <table id="DataTable" className="display" width="100%">
+        <React.Fragment>
+            <Header />
+            <div className='container'>
+            <button onClick={() => newBook() } className='btn btn-red'>Nieuw kasboek</button>
+            <h3 style={{ marginTop: '30px' }}>Gebruiker kasboeken</h3>
+            <table id="DataTable" className="table table-hover display" width="100%">
                 <thead>
                     <tr>
                         <th>Boekjaar</th>
@@ -48,8 +51,8 @@ function UserBooks() {
                 <tbody className="table-content">
                     {userbooks.map((book) => (
                         <tr key={book.id}>
-                            <td>{book.bookyear}</td>
-                            <td>{book.startsaldo}</td>
+                            <td style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/kasboek/${book.id}`} className='align-middle'>{book.bookyear}</td>
+                            <td className='align-middle'>&euro; {book.startsaldo}</td>
                             <td>
                                 <button className="delete-book">
                                     <i className="fa-solid fa-trash-can"></i>
@@ -59,7 +62,8 @@ function UserBooks() {
                     ))}
                 </tbody>
             </table>
-        </div>
+            </div>
+        </React.Fragment>
     );
 }
 
