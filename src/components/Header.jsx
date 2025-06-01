@@ -6,6 +6,8 @@ const Header = () => {
             <div className="logo">
                 <span>PM</span>Kasboek
             </div>
+
+            
         </div>
     )
 }

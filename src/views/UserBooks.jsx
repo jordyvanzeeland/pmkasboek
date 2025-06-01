@@ -5,6 +5,7 @@ import '../assets/style.css';
 import withAuth from '../components/withAuth';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/header';
+import Sidebar from '../components/Sidebar';
 
 moment.locale('nl');
 
@@ -36,8 +37,8 @@ function UserBooks() {
 
     return (
         <React.Fragment>
-            <Header />
-            <div className='container'>
+            <Sidebar />
+            <div className='content'>
             <button onClick={() => newBook() } className='btn btn-red'>Nieuw kasboek</button>
             <h3 style={{ marginTop: '30px' }}>Gebruiker kasboeken</h3>
             <table id="DataTable" className="table table-hover display" width="100%">

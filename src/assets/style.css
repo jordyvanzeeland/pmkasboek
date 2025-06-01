@@ -4,6 +4,7 @@ html, body{
     font-family: "Poppins", serif;
     font-size: 14px;
     font-weight: 500;
+    border-top: solid 3px darkred;
 }
 
 table th{
@@ -25,17 +26,23 @@ p{
     padding-bottom: 20px;
 }
 
+.months ul{
+    padding: 0;
+}
+
 .months ul li{
+    display: table-cell;
+    width: 1%;
     list-style-type: none;
-    display: inline-block;
     background: #f5f5f5;
+    border-right: solid 1px #fff;
     padding: 10px 20px;
     margin-right: 10px;
     cursor: pointer;
 }
 
 .months ul li.active{
-    background: darkred;
+    background: linear-gradient(45deg, rgb(170,0,0), darkred);
     color: #ffffff;
 }
 
@@ -61,17 +68,20 @@ p{
 }
 
 .logo{
-    font-size: 30px;
+    font-size: 25px;
     font-weight: 500;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .logo span{
-    color: darkred;
+    background: linear-gradient(45deg, rgb(170, 0, 0), darkred);
+    color: #fff;
+    padding: 0 10px;
+    border-radius: 5px;
 }
 
 .inkomsten h3, .uitgaven h3{
-    background: darkred;
+    background: linear-gradient(45deg, rgb(170,0,0), darkred);
     color: #ffffff;
     padding: 10px 15px;
     font-size: 20px;
@@ -145,7 +155,7 @@ p{
 }
 
 .login button, .login button:hover{
-    background: darkred;
+    background: linear-gradient(45deg, rgb(170,0,0), darkred);;
     color: #ffffff;
     padding: 7px 20px;
     display: block;
@@ -171,7 +181,7 @@ p{
 
 .btn-red, .btn-red:hover{
     float: right;
-    background: darkred;
+    background: linear-gradient(45deg, rgb(170,0,0), darkred);
     color: #ffffff;
     padding: 7px 20px;
     font-size: 14px;
@@ -184,12 +194,14 @@ p{
 
 .header{
     background: #f5f5f5;
+    border-top: solid 5px darkred;
     padding: 5px 15px;
 }
 
 .header .logo{
     margin-bottom: 0;
 }
+
 
 .delete-book, .delete-book:hover{
     background: darkred;
@@ -201,4 +213,33 @@ p{
 
 .delete-book i{
     color: #ffffff;
+}
+
+.sidebar{
+    width: 220px;
+    height: 100vh;
+    background: #f5f5f5;
+    position: absolute;
+    padding: 15px;
+}
+
+.sidebar-menu{
+    padding: 0;
+}
+
+.sidebar-menu li{
+    list-style-type: none;
+    font-weight: 400;
+    padding: 15px 0;
+}
+
+.sidebar-menu li i{
+    color: darkred;
+    width: 14px;
+    margin-right: 5px;
+}
+
+.content{
+    margin-left: 220px;
+    padding: 15px 30px;
 }

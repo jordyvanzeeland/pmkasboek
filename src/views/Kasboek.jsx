@@ -6,6 +6,7 @@ import { getUserAmounts, updateUserAmount, deleteUserAmount, insertUserAmount } 
 import { getUserSaldo } from '../data/Saldos';
 import withAuth from '../components/withAuth';
 import Header from '../components/header';
+import Sidebar from '../components/Sidebar';
 moment.locale('nl');
 
 const Kasboek = (props) => {
@@ -157,8 +158,8 @@ const Kasboek = (props) => {
 
   return (
     <React.Fragment>
-      <Header />
-      <div className="container-fluid">
+      <Sidebar />
+      <div className="content">
       <div className='currentsaldo'>
         <div className='row'>
           
