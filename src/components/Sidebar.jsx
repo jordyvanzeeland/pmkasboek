@@ -2,7 +2,7 @@ import React from "react";
 
 const Sidebar = () => {
     return(
-        <div className='sidebar'>
+        <div className='sidebar noPrint'>
             <div className="logo">
                 <span>PM</span>Kasboek
             </div>

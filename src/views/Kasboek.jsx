@@ -5,7 +5,6 @@ import moment from 'moment';
 import { getUserAmounts, updateUserAmount, deleteUserAmount, insertUserAmount } from '../data/Amounts';
 import { getUserSaldo } from '../data/Saldos';
 import withAuth from '../components/withAuth';
-import Header from '../components/header';
 import Sidebar from '../components/Sidebar';
 moment.locale('nl');
 
@@ -13,6 +12,7 @@ const Kasboek = (props) => {
   const [beginSaldo, setBeginSaldo] = useState(0);
   const [currentBook, setCurrentBook] = useState([]);
   const [beginMonth, setBeginMonth] = useState(0);
+  const [currentActiveMonth, setCurrentActiveMonth] = useState(0);
   const [monthlySaldo, setMonthlySaldo] = useState(Array(12).fill(0));
   const [useramounts, setUseramounts] = useState({
     incomes: [],
@@ -152,9 +152,11 @@ const Kasboek = (props) => {
   
       newSaldos[month] = runningSaldo;
     }
+
+    setCurrentActiveMonth(document.querySelector('li.active') ? document.querySelector('li.active').textContent : '');
   
     setMonthlySaldo([...newSaldos]);
-  }, [useramounts, beginSaldo, beginMonth]);
+  }, [useramounts, beginSaldo, beginMonth, currentActiveMonth]);
 
   return (
     <React.Fragment>
@@ -162,14 +164,17 @@ const Kasboek = (props) => {
       <div className="content">
       <div className='currentsaldo'>
         <div className='row'>
+
+          <div className='nameOverview showPrint'>Overzicht {currentActiveMonth}</div>
           
             <div className='col-md-6'>
               Boekjaar: <input className="form-control bookYear" type="text" name="bookYear" defaultValue={currentBook.bookyear} />
               Beginsaldo: <input className='form-control beginSaldo' type="text" name="beginSaldo" defaultValue={currentBook.startsaldo} onChange={(e) => setBeginSaldo(parseFloat(e.target.value.replace(",", ".")))} />
+              <button className='btn btn-red' style={{ float: 'none' }} onClick={() => window.print()} class="noPrint">Afdrukken</button>
             </div>
 
             <div className='col-md-6'>
-              <div className='saldo'>Totaal saldo: &euro; {monthlySaldo[selectedMonth - 1]?.toFixed(2).replace(".", ",")}</div>
+              <div className='saldo'>Totaal saldo: <span>&euro; {monthlySaldo[selectedMonth - 1]?.toFixed(2).replace(".", ",")}</span></div>
             </div>
           </div>
         </div>
@@ -182,7 +187,10 @@ const Kasboek = (props) => {
               const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
 
               return (
-                <li key={month} onClick={() => setSelectedMonth(month)} className={selectedMonth === month ? "active" : ''}>
+                <li key={month} onClick={() => {
+                  setSelectedMonth(month); 
+                  setCurrentActiveMonth(capitalizedMonth)
+                }} className={selectedMonth === month ? "active" : ''}>
                   {capitalizedMonth}
                 </li>
               );
@@ -202,11 +210,11 @@ const Kasboek = (props) => {
                       <th onClick={() => { sortOnDate('incomes', incomes) }}>Datum</th>
                       <th>Beschrijving</th>
                       <th onClick={() => { sortOnAmount('incomes', incomes) }}>Bedrag</th>
-                      <th></th>
+                      <th class="noPrint"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
+                    <tr class="noPrint">
                       <td><input className='form-control' type='text' name='inkdate' id='inkdate' /></td>
                       <td><input className='form-control' type='text' name='inkdesc' id='inkdesc' /></td>
                       <td><input className='form-control' type='text' name='inkmoney' id='inkmoney' /></td>
@@ -218,7 +226,7 @@ const Kasboek = (props) => {
                           <td><input id={`incdate-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 1, item.id)} className='form-control' type='text' defaultValue={item.date}/></td>
                           <td><input id={`incdesc-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 1, item.id)}  className='form-control' type='text' defaultValue={item.description}/></td>
                           <td><input id={`incmoney-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, 1, item.id)} className='form-control' type='text' defaultValue={item.amount}/></td>
-                          <td><span className='form-control btn-delete' onClick={() => deleteAmount("incomes", item.id)}>Verwijderen</span></td>
+                          <td><span className='form-control btn-delete noPrint' onClick={() => deleteAmount("incomes", item.id)}>Verwijderen</span></td>
                         </tr>
                       )
                   })}
@@ -239,11 +247,11 @@ const Kasboek = (props) => {
                       <th>Datum</th>
                       <th>Beschrijving</th>
                       <th>Bedrag</th>
-                      <th></th>
+                      <th class="noPrint"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
+                  <tr class="noPrint">
                       <td><input className='form-control' type='text' name='uitdate' id='uitdate' /></td>
                       <td><input className='form-control' type='text' name='uitdesc' id='uitdesc' /></td>
                       <td><input className='form-control' type='text' name='uitmoney' id='uitmoney' /></td>
@@ -255,7 +263,7 @@ const Kasboek = (props) => {
                         <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdate-${item.id}`} data-id={item.id} defaultValue={item.date}/></td>
                         <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outdesc-${item.id}`} data-id={item.id} defaultValue={item.description}/></td>
                         <td><input className='form-control' onChange={(event) => updateRow(event, 'expanses', item.id)} type='text' id={`outmoney-${item.id}`} data-id={item.id} defaultValue={item.amount}/></td>
-                        <td><span className='form-control btn-delete' onClick={() => deleteAmount("expanses", item.id)}>Verwijderen</span></td>
+                        <td><span className='form-control btn-delete noPrint' onClick={() => deleteAmount("expanses", item.id)}>Verwijderen</span></td>
                       </tr>
                       )
                   })}
