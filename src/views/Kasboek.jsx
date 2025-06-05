@@ -170,7 +170,7 @@ const Kasboek = (props) => {
             <div className='col-md-6'>
               Boekjaar: <input className="form-control bookYear" type="text" name="bookYear" defaultValue={currentBook.bookyear} />
               Beginsaldo: <input className='form-control beginSaldo' type="text" name="beginSaldo" defaultValue={currentBook.startsaldo} onChange={(e) => setBeginSaldo(parseFloat(e.target.value.replace(",", ".")))} />
-              <button className='btn btn-red' style={{ float: 'none' }} onClick={() => window.print()} class="noPrint">Afdrukken</button>
+              <button className='btn btn-red noPrint' style={{ float: 'none' }} onClick={() => window.print()}>Afdrukken</button>
             </div>
 
             <div className='col-md-6'>
