@@ -80,7 +80,7 @@ p{
     border-radius: 5px;
 }
 
-.inkomsten h3, .uitgaven h3{
+.amounts h3{
     background: linear-gradient(45deg, rgb(170,0,0), darkred);
     color: #ffffff;
     padding: 10px 15px;
@@ -248,7 +248,15 @@ p{
     display: none;
 }
 
+.onlyPDF{
+    display: none;
+}
+
 @media print {
+    .onlyPDF{
+        display: block;
+    }
+
     .noPrint{
         display: none;
     }
@@ -267,7 +275,7 @@ p{
     }
 
     .content{
-        margin-left:0;
+        margin-left:0 !important;
     }
 
     .months li{
@@ -282,16 +290,16 @@ p{
         color: darkred !important;
     }
 
-    .inkomsten{
+    .amounts{
         margin-bottom: 30px;
     }
 
-    .inkomsten h3, .uitgaven h3{
+    .amounts h3{
         color: darkred;
         padding: 0 !important;
     }
 
-    .inkomsten span, .uitgaven span{
+    .amounts span{
         float: none !important;
         text-transform: lowercase;
     }
