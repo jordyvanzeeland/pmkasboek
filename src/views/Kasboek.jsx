@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { debounce } from "lodash";
 import "../assets/style.css";
 import moment from 'moment';
-import { getUserAmounts, updateUserAmount, deleteUserAmount, insertUserAmount } from '../data/Amounts';
+import { getUserAmounts } from '../data/Amounts';
 import { getUserSaldo } from '../data/Saldos';
 import withAuth from '../components/withAuth';
 import Sidebar from '../components/Sidebar';
@@ -26,35 +25,6 @@ const Kasboek = (props) => {
   const filteredIncomes = useramounts.incomes.filter(income => moment(income.date, formats, true).month() + 1 === selectedMonth);
   const filteredExpanses = useramounts.expanses.filter(expanse => moment(expanse.date, formats, true).month() + 1 === selectedMonth);
 
-  const updateRow = debounce(async (event, type, id) => {
-    const updateDate = event.target.parentNode.parentNode.children[0].children[0].value;
-    const updateDesc = event.target.parentNode.parentNode.children[1].children[0].value;
-    const updateMoney = event.target.parentNode.parentNode.children[2].children[0].value;
-    const parsedMoney = parseFloat(updateMoney.replace(",", ".")) || 0;
-
-    await updateUserAmount(id, updateDate, updateDesc, parsedMoney, type);
-    await getData(props.router.bookid);
-  }, 500)
-
-  const deleteAmount = async (type, id) => {
-    await deleteUserAmount(id);
-    await getData(props.router.bookid);
-  }
-
-  const addAmount = async(event, type) => {
-    event.preventDefault();
-    const insertDate = event.target.amountdate.value;
-    const insertDesc = event.target.amountdesc.value;
-    const insertAmount = event.target.amountmoney.value;
-    const bookid = props.router.bookid;
-    const parsedAmount = parseFloat(insertAmount.replace(",", ".")) || 0;
-
-    await insertUserAmount(insertDate, insertDesc, parsedAmount, type, bookid);
-
-    event.target.reset();
-    await getData(props.router.bookid);
-  }
-
   const getBookYearAmounts = async(bookid) => {
     try {
       const amounts = await getUserAmounts(bookid);
@@ -73,17 +43,15 @@ const Kasboek = (props) => {
     }
   }
 
-  const getCurrentBook = async () => {
-    if (props.router.bookid) {
-      const bookSaldo = await getUserSaldo(props.router.bookid);
-      setBeginSaldo(bookSaldo.startsaldo);
-      setCurrentBook(bookSaldo);
-    }
-  }
-
   useEffect(() => {
-    getCurrentBook();
-    getData();
+    if (props.router.bookid) {
+      getBookYearAmounts(props.router.bookid);
+
+      getUserSaldo(props.router.bookid).then((bookSaldo) => {
+        setBeginSaldo(bookSaldo.startsaldo);
+        setCurrentBook(bookSaldo);
+      });
+    }
   }, [props.router.bookid]);
 
   useEffect(() => {
@@ -121,11 +89,11 @@ const Kasboek = (props) => {
 
         <div className='row'>
           <div className='col-md-6'>
-            <Amounts type="incomes" addAmount={addAmount} filteredAmounts={filteredIncomes} updateRow={updateRow} deleteAmount={deleteAmount} />
+            <Amounts type="incomes" filteredAmounts={filteredIncomes} getData={getData} bookid={props.router.bookid} />
           </div>
 
           <div className='col-md-6'>
-            <Amounts type="expanses" addAmount={addAmount} filteredAmounts={filteredExpanses} updateRow={updateRow} deleteAmount={deleteAmount} />
+            <Amounts type="expanses" filteredAmounts={filteredExpanses} getData={getData} bookid={props.router.bookid} />
           </div>
         </div>
       </div>

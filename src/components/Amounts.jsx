@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { debounce } from "lodash";
 import { parseAmount } from '../Functions';
+import { updateUserAmount, insertUserAmount, deleteUserAmount } from '../data/Amounts';
 
-const Amounts = ({ type, addAmount, filteredAmounts, updateRow, deleteAmount }) => {
+const Amounts = ({ type, filteredAmounts, getData, bookid }) => {
     const [isSortedDateAsc, setIsSortedDateAsc] = useState(false);
     const [amounts, setAmounts] = useState([]);
 
@@ -13,6 +15,34 @@ const Amounts = ({ type, addAmount, filteredAmounts, updateRow, deleteAmount }) 
         setIsSortedDateAsc(!isSortedDateAsc);
         setAmounts(sortedList);
     }
+
+    const addAmount = async(event, type) => {
+        event.preventDefault();
+        const insertDate = event.target.amountdate.value;
+        const insertDesc = event.target.amountdesc.value;
+        const insertAmount = event.target.amountmoney.value;
+        const parsedAmount = parseFloat(insertAmount.replace(",", ".")) || 0;
+    
+        await insertUserAmount(insertDate, insertDesc, parsedAmount, type, bookid);
+    
+        event.target.reset();
+        await getData(bookid);
+      }
+
+    const updateRow = debounce(async (event, type, id) => {
+        const updateDate = event.target.parentNode.parentNode.children[0].children[0].value;
+        const updateDesc = event.target.parentNode.parentNode.children[1].children[0].value;
+        const updateMoney = event.target.parentNode.parentNode.children[2].children[0].value;
+        const parsedMoney = parseFloat(updateMoney.replace(",", ".")) || 0;
+    
+        await updateUserAmount(id, updateDate, updateDesc, parsedMoney, type);
+        await getData(bookid);
+    }, 500)
+
+    const deleteAmount = async (type, id) => {
+        await deleteUserAmount(id);
+        await getData(bookid);
+      }
 
     useEffect(() => {
         setAmounts(filteredAmounts);
