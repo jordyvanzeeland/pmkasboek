@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import "../assets/style.css";
+import "../assets/print.css";
 import moment from 'moment';
 import { getUserAmounts } from '../data/Amounts';
 import { getUserSaldo } from '../data/Saldos';
@@ -11,7 +11,7 @@ import Amounts from '../components/Amounts';
 import { parseAmount } from '../Functions';
 moment.locale('nl');
 
-const Kasboek = (props) => {
+const Print = (props) => {
   const [beginSaldo, setBeginSaldo] = useState(0);
   const [currentBook, setCurrentBook] = useState([]);
   const [beginMonth, setBeginMonth] = useState(0);
@@ -101,4 +101,4 @@ const Kasboek = (props) => {
   )
 }
 
-export default withAuth(Kasboek)
+export default withAuth(Print)

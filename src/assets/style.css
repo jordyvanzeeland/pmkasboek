@@ -252,6 +252,16 @@ p{
     display: none;
 }
 
+.totalNegative{
+    display: none;
+    background: linear-gradient(45deg, rgb(170,0,0), darkred);
+    color: #ffffff; 
+    text-align: center; 
+    padding: 7px 25px; 
+    width: fit-content; 
+    float: right;
+}
+
 @media print {
     .onlyPDF{
         display: block;

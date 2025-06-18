@@ -1,0 +1,69 @@
+.onlyPDF{
+    display: block;
+}
+
+.noPrint{
+    display: none;
+}
+
+.showPrint{
+    display: block;
+}
+
+table{
+    width: 100% !important;
+}
+
+input.form-control{
+    border-style: none !important;
+    padding: 0 !important;
+}
+
+.content{
+    margin-left:0 !important;
+}
+
+.months li{
+    display: none !important;
+}
+
+.nameOverview{
+    display: block !important;
+    color: #000 !important;
+    font-size: 25px !important;
+    margin-bottom: 30px !important;
+    color: darkred !important;
+}
+
+.amounts{
+    margin-bottom: 30px;
+}
+
+.amounts h3{
+    color: darkred;
+    padding: 0 !important;
+    background: none !important;
+}
+
+.amounts span{
+    float: none !important;
+    text-transform: lowercase;
+}
+
+.saldo{
+    text-align: left !important;
+    font-size: 15px !important;
+}
+
+.saldo span{
+    display: block;
+    font-weight: 400;
+}
+
+.beginSaldo, .bookYear{
+    display: block;
+}
+
+.totalNegative{
+    display: none !important;
+}

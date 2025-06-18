@@ -6,3 +6,9 @@ export const parseAmount = (value) => {
     }
     return 0;
 };
+
+export const sortOnDate = (list, isSortedDateAsc) => {
+    return [...list].sort((a, b) => {
+      return isSortedDateAsc ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date);
+    }).reverse();
+}
