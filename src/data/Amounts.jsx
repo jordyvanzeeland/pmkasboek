@@ -21,7 +21,6 @@ export const getBookAmounts = async (bookid, limit) => {
         headers: {
             "Authorization": `Bearer ${localStorage.getItem('token')}`,
             "Accept": "application/json",
-            "limit": limit
         }
     })
     .then(response => response.json())

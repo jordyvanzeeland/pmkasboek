@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import "../assets/style.css";
 import moment from 'moment';
-import { getUserAmounts } from '../data/Amounts';
+import { getUserAmounts, getBookAmounts } from '../data/Amounts';
 import { getUserSaldo } from '../data/Saldos';
 import withAuth from '../components/withAuth';
 import Sidebar from '../components/Sidebar';
@@ -9,6 +9,7 @@ import MonthSelector from '../components/MonthSelector';
 import Saldo from '../components/Saldo';
 import Amounts from '../components/Amounts';
 import { parseAmount } from '../Functions';
+import Header from '../components/Header';
 moment.locale('nl');
 
 const Kasboek = (props) => {
@@ -81,9 +82,9 @@ const Kasboek = (props) => {
 
   return (
     <React.Fragment>
-      <Sidebar />
+      <Header />
 
-      <div className="content" ref={printRef}>
+      <div className="content" style={{ marginLeft: 0 }} ref={printRef}>
         <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth}/>
         <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setCurrentActiveMonth={setCurrentActiveMonth} />   
 

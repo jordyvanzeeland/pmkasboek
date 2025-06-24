@@ -33,7 +33,7 @@ p{
 }
 
 .card i{
-    background: darkred;
+    background: linear-gradient(45deg, rgb(170,0,0), darkred);;
     color: #ffffff;
     width: 50px;
     height: 50px;
@@ -246,6 +246,64 @@ p{
     color: #fff;
 }
 
+.menubar{
+    box-shadow: 0 1px 15px 1px rgba(81, 77, 92, .5);
+    padding: 20px 25px;
+    position: relative;
+}
+
+.menubar ul{
+    padding: 0;
+    margin: 0;
+}
+
+.menubar ul li:first-child{
+    margin-left: 0;
+}
+
+.menubar ul li{
+    list-style-type: none;
+    display: inline-block;
+    margin: 0 25px;
+    color: rgba(0,0,0,0.7);
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.menubar ul li i{
+    margin-right: 5px;
+}
+
+.menubar ul a.active li{
+    color: darkred;
+}
+
+.header .header_right{
+    color: #ffffff;
+    float: right;
+    padding: 7px;
+}
+
+.header .header_right i{
+    font-size: 15px;
+}
+
+.header ul{
+    padding: 0;
+    margin: 0;
+}
+
+.header ul li{
+    list-style-type: none;
+    display: inline-block;
+    margin: 0 15px;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.header ul li i{
+    margin-right: 5px;
+}
 
 .delete-book, .delete-book:hover{
     background: darkred;
@@ -286,6 +344,8 @@ p{
 .content{
     margin-left: 220px;
     padding: 15px 30px;
+    background: #f9f9f9;
+    height: 100vh;
 }
 
 .showPrint{
