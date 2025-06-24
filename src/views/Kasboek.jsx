@@ -27,7 +27,7 @@ const Kasboek = (props) => {
 
   const getBookYearAmounts = async(bookid) => {
     try {
-      const amounts = await getUserAmounts(bookid);
+      const amounts = await getBookAmounts(bookid);
       setUseramounts({
         incomes: amounts.filter(amount => amount.type.id === 1),
         expanses: amounts.filter(amount => amount.type.id === 2)

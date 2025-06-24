@@ -1,9 +1,27 @@
-export const getUserAmounts = async (bookid) => {
+export const getUserAmounts = async (limit, ordercolumn, orderasc) => {
+    return await fetch(`http://localhost:8000/api/amounts/`, {
+        method: 'GET',
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem('token')}`,
+            "Accept": "application/json",
+            "limit": limit,
+            "order": ordercolumn,
+            "orderasc": orderasc
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        return data;
+    })
+}
+
+export const getBookAmounts = async (bookid, limit) => {
     return await fetch(`http://localhost:8000/api/amounts/${bookid}`, {
         method: 'GET',
         headers: {
             "Authorization": `Bearer ${localStorage.getItem('token')}`,
-            "Accept": "application/json"
+            "Accept": "application/json",
+            "limit": limit
         }
     })
     .then(response => response.json())
