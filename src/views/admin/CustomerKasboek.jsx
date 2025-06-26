@@ -1,21 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import "../assets/style.css";
+import "../../assets/admin.css";
 import moment from 'moment';
-import { getUserAmounts, getBookAmounts } from '../data/Amounts';
-import { getUserSaldo, updateUserSaldos } from '../data/Saldos';
-import withAuth from '../components/withAuth';
-import Sidebar from '../components/Sidebar';
-import MonthSelector from '../components/MonthSelector';
-import Saldo from '../components/Saldo';
-import Amounts from '../components/Amounts';
-import { parseAmount } from '../Functions';
-import Header from '../components/Header';
+import { getUserSaldo } from '../../data/Saldos';
+import withAuth from '../../components/withAuth';
+import MonthSelector from '../../components/MonthSelector';
+import Saldo from '../../components/Saldo';
+import Amounts from '../../components/Amounts';
+import { parseAmount } from '../../Functions';
+import Header from '../../components/Header';
+import { getUserBookAmounts } from '../../data/Admin';
 moment.locale('nl');
 
-const Kasboek = (props) => {
+const CustomerKasboek = (props) => {
   const [beginSaldo, setBeginSaldo] = useState(0);
-  const [currentBookYear, setCurrentBookYear] = useState(0);
-
   const [currentBook, setCurrentBook] = useState([]);
   const [beginMonth, setBeginMonth] = useState(0);
   const [currentActiveMonth, setCurrentActiveMonth] = useState(0);
@@ -28,9 +25,10 @@ const Kasboek = (props) => {
   const filteredIncomes = useramounts.incomes.filter(income => moment(income.date, formats, true).month() + 1 === selectedMonth);
   const filteredExpanses = useramounts.expanses.filter(expanse => moment(expanse.date, formats, true).month() + 1 === selectedMonth);
 
-  const getBookYearAmounts = async(bookid) => {
+  const getBookYearAmounts = async(bookid, customerid) => {
     try {
-      const amounts = await getBookAmounts(bookid);
+      const amounts = await getUserBookAmounts(bookid, customerid);
+      console.log(amounts);
       setUseramounts({
         incomes: amounts.filter(amount => amount.type.id === 1),
         expanses: amounts.filter(amount => amount.type.id === 2)
@@ -42,13 +40,13 @@ const Kasboek = (props) => {
 
   const getData = async () => {
     if (props.router.bookid) {
-      getBookYearAmounts(props.router.bookid);
+      getBookYearAmounts(props.router.bookid, props.router.customerid);
     }
   }
 
   useEffect(() => {
     if (props.router.bookid) {
-      getBookYearAmounts(props.router.bookid);
+      getBookYearAmounts(props.router.bookid, props.router.customerid);
 
       getUserSaldo(props.router.bookid).then((bookSaldo) => {
         setBeginSaldo(bookSaldo.startsaldo);
@@ -89,16 +87,16 @@ const Kasboek = (props) => {
       {console.log(currentBook)}
 
       <div className="content" style={{ marginLeft: 0 }} ref={printRef}>
-        <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth}/>
+        <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth} admin="true"/>
         <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setCurrentActiveMonth={setCurrentActiveMonth} />   
 
         <div className='row'>
           <div className='col-md-6'>
-            <Amounts type="1" filteredAmounts={filteredIncomes} getData={getData} bookid={props.router.bookid} />
+            <Amounts type="1" filteredAmounts={filteredIncomes} getData={getData} bookid={props.router.bookid} admin="true"/>
           </div>
 
           <div className='col-md-6'>
-            <Amounts type="2" filteredAmounts={filteredExpanses} getData={getData} bookid={props.router.bookid} />
+            <Amounts type="2" filteredAmounts={filteredExpanses} getData={getData} bookid={props.router.bookid} admin="true"/>
           </div>
         </div>
       </div>
@@ -106,4 +104,4 @@ const Kasboek = (props) => {
   )
 }
 
-export default withAuth(Kasboek)
+export default withAuth(CustomerKasboek)

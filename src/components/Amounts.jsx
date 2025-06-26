@@ -3,7 +3,7 @@ import { debounce } from "lodash";
 import { parseAmount, sortOnDate } from '../Functions';
 import { updateUserAmount, insertUserAmount, deleteUserAmount } from '../data/Amounts';
 
-const Amounts = ({ type, filteredAmounts, getData, bookid }) => {
+const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
     const [amounts, setAmounts] = useState([]);
 
     const addAmount = async(event) => {
@@ -52,24 +52,33 @@ const Amounts = ({ type, filteredAmounts, getData, bookid }) => {
                             <th>Datum</th>
                             <th>Beschrijving</th>
                             <th>Bedrag</th>
-                            <th className="noPrint"></th>
+                            {!admin && ( <th className="noPrint"></th> )}
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="noPrint">
+                        {!admin && (<tr className="noPrint">
                             <td><input className='form-control' type='text' name='amountdate' id='amountdate' /></td>
                             <td><input className='form-control' type='text' name='amountdesc' id='amountdesc' /></td>
                             <td><input className='form-control' type='text' name='amountmoney' id='amountmoney' /></td>
                             <td><input className='form-control' type="submit" name="submit" value="Toevoegen" /></td>
-                        </tr>
+                        </tr>)}
+
                         {amounts.map(item => {
                         return (
-                            <tr key={item.id}>
-                                <td><input id={`amountdate-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, item.id)} className='form-control' type='text' defaultValue={item.date}/></td>
+                            <React.Fragment>
+                            {!admin && ( <tr key={item.id}>
+                                <td><input id={`amountdate-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, item.id)} className='form-control' type='text' defaultValue={item.date} /></td>
                                 <td><input id={`amountdesc-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, item.id)}  className='form-control' type='text' defaultValue={item.description}/></td>
                                 <td><input id={`amountmoney-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, item.id)} className='form-control' type='text' defaultValue={item.amount}/></td>
                                 <td><span className='form-control btn-delete noPrint' onClick={() => deleteAmount(item.id)}>Verwijderen</span></td>
-                            </tr>
+                            </tr> )}
+
+                            {admin && ( <tr key={item.id}>
+                                <td><div id={`amountdate-${item.id}`}>{item.date}</div></td>
+                                <td><div id={`amountdesc-${item.id}`}>{item.description}</div></td>
+                                <td><div id={`amountmoney-${item.id}`}>{item.amount}</div></td>
+                            </tr> )}
+                            </React.Fragment>
                         )
                     })}
                     </tbody>

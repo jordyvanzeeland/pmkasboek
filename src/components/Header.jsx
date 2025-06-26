@@ -19,8 +19,8 @@ const Header = () => {
 
             <div className="menubar">
                 <ul>
-                    <NavLink to="/" exact="true"><li><i class="fa-solid fa-gauge-high"></i> Overzicht</li></NavLink>
-                    <NavLink to="/kasboek" exact="true"><li><i class="fa-solid fa-book"></i> Kasboeken</li></NavLink>
+                    <NavLink to="/" exact="true"><li><i className="fa-solid fa-gauge-high"></i> Overzicht</li></NavLink>
+                    <NavLink to="/kasboek" exact="true"><li><i className="fa-solid fa-book"></i> Kasboeken</li></NavLink>
                 </ul>
             </div>
         </React.Fragment>
