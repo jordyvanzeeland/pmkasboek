@@ -8,26 +8,34 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
 
     const addAmount = async(event) => {
         event.preventDefault();
-        const insertDate = event.target.amountdate.value;
-        const insertDesc = event.target.amountdesc.value;
-        const insertAmount = event.target.amountmoney.value;
+        const formData = new FormData(event.target);
+
+        const insertDate = formData.get("amountdate");
+        const insertDesc = formData.get("amountdesc");
+        const insertAmount = formData.get("amountmoney");
         const parsedAmount = parseFloat(insertAmount.replace(",", ".")) || 0;
     
         await insertUserAmount(insertDate, insertDesc, parsedAmount, type, bookid);
-    
         event.target.reset();
         await getData(bookid);
       }
 
-    const updateRow = debounce(async (event, id) => {
-        const updateDate = event.target.parentNode.parentNode.children[0].children[0].value;
-        const updateDesc = event.target.parentNode.parentNode.children[1].children[0].value;
-        const updateMoney = event.target.parentNode.parentNode.children[2].children[0].value;
+    const updateRow = debounce(async (id, updateDate, updateDesc, updateMoney) => {
         const parsedMoney = parseFloat(updateMoney.replace(",", ".")) || 0;
-    
         await updateUserAmount(id, updateDate, updateDesc, parsedMoney, type);
         await getData(bookid);
     }, 500)
+
+    const handleFieldChange = (id, field, value) => {
+        const updatedItem = amounts.find(item => item.id === id);
+        if (!updatedItem) return;
+
+        const updateDate = field === 'date' ? value : updatedItem.date;
+        const updateDesc = field === 'description' ? value : updatedItem.description;
+        const updateMoney = field === 'amount' ? value : updatedItem.amount;
+
+        updateRow(id, updateDate, updateDesc, updateMoney);
+    }
 
     const deleteAmount = async (id) => {
         await deleteUserAmount(id);
@@ -67,9 +75,9 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
                         return (
                             <React.Fragment>
                             {!admin && ( <tr key={item.id}>
-                                <td><input id={`amountdate-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, item.id)} className='form-control' type='text' defaultValue={item.date} /></td>
-                                <td><input id={`amountdesc-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, item.id)}  className='form-control' type='text' defaultValue={item.description}/></td>
-                                <td><input id={`amountmoney-${item.id}`} data-id={item.id} onChange={(event) => updateRow(event, item.id)} className='form-control' type='text' defaultValue={item.amount}/></td>
+                                <td><input id={`amountdate-${item.id}`} data-id={item.id} onChange={(event) => handleFieldChange(item.id, "date", event.target.value)} className='form-control' type='text' defaultValue={item.date} /></td>
+                                <td><input id={`amountdesc-${item.id}`} data-id={item.id} onChange={(event) => handleFieldChange(item.id, "description", event.target.value)}  className='form-control' type='text' defaultValue={item.description}/></td>
+                                <td><input id={`amountmoney-${item.id}`} data-id={item.id} onChange={(event) => handleFieldChange(item.id, "amount", event.target.value)} className='form-control' type='text' defaultValue={item.amount}/></td>
                                 <td><span className='form-control btn-delete noPrint' onClick={() => deleteAmount(item.id)}>Verwijderen</span></td>
                             </tr> )}
 

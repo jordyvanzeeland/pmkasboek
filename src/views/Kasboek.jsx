@@ -86,8 +86,6 @@ const Kasboek = (props) => {
     <React.Fragment>
       <Header />
 
-      {console.log(currentBook)}
-
       <div className="content" style={{ marginLeft: 0 }} ref={printRef}>
         <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth}/>
         <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setCurrentActiveMonth={setCurrentActiveMonth} />   

@@ -88,12 +88,17 @@ p{
 }
 
 .currentsaldo{
-    padding:20px 0;
+    background: #fff;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+    margin-bottom: 30px;
+    padding: 15px 15px 0 15px;
+    margin-top: 15px;
+    position: relative;
 }
 
 .saldo{
     text-align: right;
-    font-size: 25px;
+    font-size: 20px;
 }
 
 .beginSaldo, .bookYear{
@@ -315,6 +320,13 @@ p{
 
 .delete-book i{
     color: #ffffff;
+    background: linear-gradient(45deg, rgb(170, 0, 0), darkred);
+    color: #ffffff;
+    width: 25px;
+    height: 30px;
+    text-align: center;
+    border-radius: 50%;
+    line-height: 30px;
 }
 
 .sidebar{
@@ -363,7 +375,8 @@ p{
     text-align: center; 
     padding: 7px 25px; 
     width: fit-content; 
-    float: right;
+    position: absolute;
+    right: 14px;
 }
 
 @media print {
