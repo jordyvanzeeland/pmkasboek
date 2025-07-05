@@ -84,8 +84,7 @@ const CustomerKasboek = (props) => {
     <React.Fragment>
       <Header />
 
-      {console.log(currentBook)}
-
+      <div className='pdf-loader-screen'></div>
       <div className="content" style={{ marginLeft: 0 }} ref={printRef}>
         <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth} admin="true"/>
         <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setCurrentActiveMonth={setCurrentActiveMonth} />   

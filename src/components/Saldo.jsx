@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { debounce } from "lodash";
 import { updateUserSaldos } from '../data/Saldos';
+import { printToPDF } from '../Functions';
 
 const Saldo = ({ currentActiveMonth, currentBook, setBeginSaldo, monthlySaldo, selectedMonth, admin }) => {
     const monthTotal = monthlySaldo[selectedMonth - 1]?.toFixed(2).replace(".", ",");
@@ -42,6 +43,7 @@ const Saldo = ({ currentActiveMonth, currentBook, setBeginSaldo, monthlySaldo, s
                     )}
                     
                     <button className='btn btn-red noPrint' style={{ float: 'none' }} onClick={() => window.print()}>Afdrukken</button>
+                    <button className='btn btn-red noPrint' style={{ float: 'none' }} onClick={() => printToPDF()}>Exporteren</button>
                 </div>
 
                 <div className='col-md-6'>

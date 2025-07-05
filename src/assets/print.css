@@ -1,33 +1,33 @@
-.onlyPDF{
-    display: block;
+.content-print .onlyPDF{
+    display: block !important;
 }
 
-.noPrint{
-    display: none;
+.content-print .noPrint{
+    display: none !important;
 }
 
-.showPrint{
-    display: block;
+.content-print .showPrint{
+    display: block !important;
 }
 
-table{
+.content-print table{
     width: 100% !important;
 }
 
-input.form-control{
+.content-print input.form-control{
     border-style: none !important;
     padding: 0 !important;
 }
 
-.content{
+.content-print .content{
     margin-left:0 !important;
 }
 
-.months li{
+.content-print .months li{
     display: none !important;
 }
 
-.nameOverview{
+.content-print .nameOverview{
     display: block !important;
     color: #000 !important;
     font-size: 25px !important;
@@ -35,35 +35,56 @@ input.form-control{
     color: darkred !important;
 }
 
-.amounts{
-    margin-bottom: 30px;
+.content-print .amounts{
+    margin-bottom: 30px !important;
+    box-shadow: none !important;
 }
 
-.amounts h3{
+.content-print .amounts h3{
     color: darkred;
     padding: 0 !important;
     background: none !important;
 }
 
-.amounts span{
+.content-print .amounts span{
     float: none !important;
     text-transform: lowercase;
 }
 
-.saldo{
+.content-print .saldo{
     text-align: left !important;
     font-size: 15px !important;
 }
 
-.saldo span{
+.content-print .saldo span{
     display: block;
     font-weight: 400;
 }
 
-.beginSaldo, .bookYear{
-    display: block;
+.content-print .totalNegative{
+    display: none !important;
 }
 
-.totalNegative{
-    display: none !important;
+.content-print .currentsaldo{
+    box-shadow: none !important;
+}
+
+.content-print .col-md-6{
+    width: 100%;
+}
+
+.content-print .beginSaldo, .content-print .bookYear{
+    display: block !important;
+}
+
+.content-print .amounts form{
+    padding: 0 !important;
+}
+
+.content-print .currentsaldo{
+    padding: 0 !important;
+}
+
+.content-print{
+    background: #ffffff !important;
 }

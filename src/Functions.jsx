@@ -1,3 +1,4 @@
+import html2pdf from 'html2pdf.js';
 import Config from "./Config.json";
 
 export const parseAmount = (value) => {
@@ -14,6 +15,25 @@ export const sortOnDate = (list, isSortedDateAsc) => {
       return isSortedDateAsc ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date);
     }).reverse();
 }
+
+export const printToPDF = async () => {
+    const element = document.getElementsByClassName('content')[0];
+    element.classList.add(['content-print']);
+    document.querySelector('.pdf-loader-screen').style.display = "block";
+
+    const opt = {
+        margin:       0.5,
+        filename:     `kasboek-maand.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      html2pdf().from(element).set(opt).save().then(result => {
+        element.classList.remove(['content-print']);
+        document.querySelector('.pdf-loader-screen').style.display = "none";
+      });
+};
 
 export const fetchApi = async (method, uri, additionalHeaders, body) => {
     const url = `${Config.API_URL}/api/${uri}`;

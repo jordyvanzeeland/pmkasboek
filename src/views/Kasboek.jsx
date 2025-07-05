@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import "../assets/style.css";
+import "../assets/print.css";
 import moment from 'moment';
 import { getUserAmounts, getBookAmounts } from '../data/Amounts';
 import { getUserSaldo, updateUserSaldos } from '../data/Saldos';
@@ -24,7 +25,7 @@ const Kasboek = (props) => {
   const [selectedMonth, setSelectedMonth] = useState(1);
   const printRef = useRef();
 
-  const formats = ["DD-MM-YYYY", "YYYY-MM-DD"];
+  const formats = ["DD-MM-YYYY"];
   const filteredIncomes = useramounts.incomes.filter(income => moment(income.date, formats, true).month() + 1 === selectedMonth);
   const filteredExpanses = useramounts.expanses.filter(expanse => moment(expanse.date, formats, true).month() + 1 === selectedMonth);
 
@@ -86,6 +87,7 @@ const Kasboek = (props) => {
     <React.Fragment>
       <Header />
 
+      <div className='pdf-loader-screen'></div>
       <div className="content" style={{ marginLeft: 0 }} ref={printRef}>
         <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth}/>
         <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setCurrentActiveMonth={setCurrentActiveMonth} />   
