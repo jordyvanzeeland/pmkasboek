@@ -1,5 +1,6 @@
 import html2pdf from 'html2pdf.js';
 import Config from "./Config.json";
+import { currentUser } from "./data/Auth";
 
 export const parseAmount = (value) => {
     if (typeof value === "string") {
@@ -14,6 +15,16 @@ export const sortOnDate = (list, isSortedDateAsc) => {
     return [...list].sort((a, b) => {
       return isSortedDateAsc ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date);
     }).reverse();
+}
+
+export const getUser = async () => {
+    const data = await currentUser();
+    return data;
+}
+
+export const checkIfAdmin = async () => {
+    const data = await currentUser();
+    return data.isAdmin;
 }
 
 export const printToPDF = async () => {

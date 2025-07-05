@@ -412,6 +412,13 @@ p{
     margin: 20px;
 }
 
+.header .user{
+    display: inline-block;
+    border-right: solid 1px #ffffff;
+    padding-right: 15px;
+    font-size: 15px;
+}
+
 @media print {
     .onlyPDF{
         display: block;

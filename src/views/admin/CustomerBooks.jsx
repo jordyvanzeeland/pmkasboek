@@ -24,7 +24,7 @@ function CustomerBooks(props) {
 
     return (
         <React.Fragment>
-            <Header />
+            <Header isAdmin="true"/>
             <div className='content' style={{ marginLeft: 0 }}>
 
                 <div className='row'>

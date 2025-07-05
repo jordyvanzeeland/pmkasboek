@@ -5,17 +5,23 @@ import { getUserAmounts } from '../data/Amounts';
 import '../assets/style.css';
 import withAuth from '../components/withAuth';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import { getUser } from "../Functions";
 import Header from '../components/Header';
 
 moment.locale('nl');
 
 function UserBooks() {
+    const [currentUser, setCurrentUser] = useState([]);
     const [userbooks, setUserbooks] = useState([]);
     const [userTransactions, setUserTransactions] = useState([]);
     const [nrOfBooks, setNrOfBooks] = useState(0);
     const navigate = useNavigate();
     const currentYear = new Date().getFullYear();
+
+    const getCurrentUser = async () => {
+        const user = await getUser();
+        setCurrentUser(user) 
+    } 
 
     const newBook = async () => {
         try {
@@ -31,6 +37,8 @@ function UserBooks() {
     }
 
     useEffect(() => {
+        getCurrentUser();
+
         const fetchUserBooks = async () => {
             try {
                 const transactions = await getUserTransactions(5, 'id', 'desc');
@@ -50,13 +58,13 @@ function UserBooks() {
         <React.Fragment>
             <Header />
             <div className='content' style={{ marginLeft: 0 }}>
-            <h3 style={{ marginTop: '30px' }}>Overzicht</h3>
+            <h3 style={{ marginTop: '30px' }}>Kasboeken overzicht {currentUser.name}</h3>
 
             <div className='row'>
                 <div className='col-md-5'>
                     <div className='card'>
                         <button onClick={() => newBook() } className='btn btn-red btn-new'>Nieuw kasboek</button>
-                        <h3><i className="fa-solid fa-book-open"></i> kasboeken: <div className='circle'><span>{nrOfBooks}</span></div></h3> 
+                        <h3><i className="fa-solid fa-book-open"></i> Kasboeken:</h3> 
                         
 
                         <table id="DataTable" className="table table-hover display" width="100%">

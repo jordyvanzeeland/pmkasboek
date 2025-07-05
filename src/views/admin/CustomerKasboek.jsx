@@ -82,7 +82,7 @@ const CustomerKasboek = (props) => {
 
   return (
     <React.Fragment>
-      <Header />
+      <Header isAdmin="true"/>
 
       <div className='pdf-loader-screen'></div>
       <div className="content" style={{ marginLeft: 0 }} ref={printRef}>

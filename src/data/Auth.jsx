@@ -11,3 +11,7 @@ export const register = async (name, email, password) => {
 export const authenticate = async (username, password) => {
     return fetchApi('POST', `auth/login?email=${username}&password=${password}`);
 }
+
+export const currentUser = async() => {
+    return fetchApi('POST', `auth/me`);
+}
