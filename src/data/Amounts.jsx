@@ -22,7 +22,7 @@ export const insertUserAmount = async (date, description, amount, type, bookid) 
     })
 }
 
-export const updateUserAmount = async (amountid, date, description, amount, type) => {
+export const updateUserAmount = async (amountid, date, description, amount, type, bookid) => {
     return fetchApi('PUT', `amounts/${amountid}/update`, null, {
         date: date,
         description: description,

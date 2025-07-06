@@ -22,7 +22,7 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
 
     const updateRow = debounce(async (id, updateDate, updateDesc, updateMoney) => {
         const parsedMoney = parseFloat(updateMoney.replace(",", ".")) || 0;
-        await updateUserAmount(id, updateDate, updateDesc, parsedMoney, type);
+        await updateUserAmount(id, updateDate, updateDesc, parsedMoney, type, bookid);
         await getData(bookid);
     }, 500)
 
@@ -65,7 +65,7 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
                     </thead>
                     <tbody>
                         {!admin && (<tr className="noPrint">
-                            <td><input className='form-control' type='text' name='amountdate' id='amountdate' /></td>
+                            <td><input className='form-control' type='text' name='amountdate' id='amountdate' placeholder='DD-MM-YYYY'/></td>
                             <td><input className='form-control' type='text' name='amountdesc' id='amountdesc' /></td>
                             <td><input className='form-control' type='text' name='amountmoney' id='amountmoney' /></td>
                             <td><input className='form-control' type="submit" name="submit" value="Toevoegen" /></td>
