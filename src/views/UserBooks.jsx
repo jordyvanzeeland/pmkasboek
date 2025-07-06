@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
-import { getUserSaldos, insertUserSaldos } from '../data/Saldos';
+import { deleteUserSaldos, getUserSaldos, insertUserSaldos } from '../data/Saldos';
 import { getUserAmounts } from '../data/Amounts';
 import '../assets/style.css';
 import withAuth from '../components/withAuth';
@@ -14,44 +14,44 @@ function UserBooks() {
     const [currentUser, setCurrentUser] = useState([]);
     const [userbooks, setUserbooks] = useState([]);
     const [userTransactions, setUserTransactions] = useState([]);
-    const [nrOfBooks, setNrOfBooks] = useState(0);
     const navigate = useNavigate();
     const currentYear = new Date().getFullYear();
 
-    const getCurrentUser = async () => {
-        const user = await getUser();
-        setCurrentUser(user) 
-    } 
-
     const newBook = async () => {
         try {
-            await insertUserSaldos(currentYear);
-            navigate(`/kasboek/${currentYear}`);
+            const data = await insertUserSaldos(currentYear);
+            navigate(`/kasboek/${data.newbook.id}`);
         } catch (error) {
             console.error("Error creating user books:", error);
         }
     }
 
-    const getUserTransactions = async (limit, column, asc) => {
-        return await getUserAmounts(limit, column, asc);
+    const deleteBook = async (bookid) => {
+        try {
+            await deleteUserSaldos(bookid);
+            await getData();
+        } catch (error) {
+            console.error("Error deleting user books:", error);
+        }
     }
 
+    const getData = async () => {
+        const user = await getUser();
+        setCurrentUser(user) 
+
+        try {
+            const transactions = await getUserAmounts(5, 'id', 'desc');
+            setUserTransactions(transactions);
+
+            const saldos = await getUserSaldos();
+            setUserbooks(saldos.books);
+        } catch (error) {
+            console.error("Error fetching user books:", error);
+        }
+    };
+
     useEffect(() => {
-        getCurrentUser();
-
-        const fetchUserBooks = async () => {
-            try {
-                const transactions = await getUserTransactions(5, 'id', 'desc');
-                setUserTransactions(transactions);
-
-                const saldos = await getUserSaldos();
-                setUserbooks(saldos.books);
-                setNrOfBooks(saldos.count);
-            } catch (error) {
-                console.error("Error fetching user books:", error);
-            }
-        };
-        fetchUserBooks();
+        getData();
     }, []);
 
     return (
@@ -72,7 +72,7 @@ function UserBooks() {
                                 <tr>
                                     <th>Boekjaar</th>
                                     <th>Beginsaldo</th>
-                                    {/* <th></th> */}
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody className="table-content">
@@ -80,11 +80,11 @@ function UserBooks() {
                                     <tr key={book.id}>
                                         <td style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/kasboek/${book.id}`} className='align-middle'>{book.bookyear}</td>
                                         <td className='align-middle'>&euro; {book.startsaldo}</td>
-                                        {/* <td>
-                                            <button className="delete-book">
+                                        <td>
+                                            <button onClick={() => deleteBook(book.id)}className="delete-book">
                                                 <i className="fa-solid fa-trash-can"></i>
                                             </button>
-                                        </td> */}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

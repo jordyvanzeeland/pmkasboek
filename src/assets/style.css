@@ -310,6 +310,7 @@ p{
     color: #ffffff;
     float: right;
     padding: 7px;
+    margin-top: -5px;
 }
 
 .header .header_right i{
@@ -324,7 +325,7 @@ p{
 .header ul li{
     list-style-type: none;
     display: inline-block;
-    margin: 0 15px;
+    margin: 0 3px;
     font-weight: 400;
     font-size: 15px;
 }
@@ -416,6 +417,11 @@ p{
     display: inline-block;
     border-right: solid 1px #ffffff;
     padding-right: 15px;
+    font-size: 15px;
+}
+
+.header .btn-logout{
+    color: #ffffff;
     font-size: 15px;
 }
 

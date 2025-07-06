@@ -1,25 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
-import { getCustomerBooks, getCustomers } from '../../data/Admin';
+import { getCustomerBooks } from '../../data/Admin';
 import '../../assets/admin.css';
 import withAuth from '../../components/withAuth';
 import Header from '../../components/Header';
+import { getUser } from "../../Functions";
+import Forbidden from '../../components/Forbidden';
 
 moment.locale('nl');
 
 function CustomerBooks(props) {
     const [customerBooks, setCustomerBooks] = useState([]);
+    const [userIsAdmin, setUserIsAdmin] = useState(0);
 
-    useEffect(() => {
-        const fetchUserBooks = async () => {
+    const getData = async () => {
+        const user = await getUser();
+        
+        if(user.isAdmin === 1){
+            setUserIsAdmin(user.isAdmin);
+            
             try {
                 const customers = await getCustomerBooks(props.router.customerid);
                 setCustomerBooks(customers);
             } catch (error) {
                 console.error("Error fetching user books:", error);
             }
-        };
-        fetchUserBooks();
+        }
+    }
+
+    useEffect(() => {
+        getData();
     }, []);
 
     return (
@@ -29,28 +39,28 @@ function CustomerBooks(props) {
 
                 <div className='row'>
                     <div className='col-md-12'>
-                        <div className='card'>
-                            <h3><i className="fa-solid fa-users"></i> Klantoverzicht</h3> 
-                            
+                        {userIsAdmin === 1 ? (
+                            <div className='card'>
+                                <h3><i className="fa-solid fa-users"></i> Klantoverzicht</h3> 
 
-                            <table id="DataTable" className="table table-hover display" width="100%">
-                                <thead>
-                                    <tr>
-                                        <th>Boekjaar</th>
-                                        <th>Beginsaldo</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="table-content">
-                                    {customerBooks.map((book) => (
-                                        <tr key={book.id}>
-                                            <td style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/admin/customer/${props.router.customerid}/book/${book.id}`} className='align-middle'>{book.bookyear}</td>
-                                            <td className='align-middle'>{book.startsaldo}</td>
+                                <table id="DataTable" className="table table-hover display" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Boekjaar</th>
+                                            <th>Beginsaldo</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            
-                        </div>
+                                    </thead>
+                                    <tbody className="table-content">
+                                        {customerBooks.map((book) => (
+                                            <tr key={book.id}>
+                                                <td style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/admin/customer/${props.router.customerid}/book/${book.id}`} className='align-middle'>{book.bookyear}</td>
+                                                <td className='align-middle'>&euro; {book.startsaldo}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : <Forbidden />}
                     </div>
                 </div>
             </div>

@@ -1,25 +1,32 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { getUser } from "../Functions";
 
 const Header = (props) => {
     const [currentUser, setCurrentUser] = useState([]);
-    const [userIsAdmin, setUserIsAdmin] = useState(0);
+    const navigate = useNavigate();
 
     const getCurrentUser = async () => {
         const user = await getUser();
         setCurrentUser(user) 
     } 
-    
-    getCurrentUser();
+
+    const logout = () => {
+        localStorage.clear();
+        navigate("/")
+    }
+
+    useEffect(() => {
+        getCurrentUser();
+    }, [])
 
     return(
         <React.Fragment>
             <div className='header'>
                 <div className="header_right">
                     <ul>
-                        <div className="user">{currentUser.name}</div>
-                        <li><i className="fas fa-sign-out-alt"></i> Uitloggen</li>
+                        <li className="user">{currentUser.name}</li>
+                        <li><button onClick={() => logout()} className="btn btn-logout"><i className="fas fa-sign-out-alt"></i> Uitloggen</button></li>
                     </ul>
                 </div>
 

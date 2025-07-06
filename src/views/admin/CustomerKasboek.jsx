@@ -6,12 +6,14 @@ import withAuth from '../../components/withAuth';
 import MonthSelector from '../../components/MonthSelector';
 import Saldo from '../../components/Saldo';
 import Amounts from '../../components/Amounts';
-import { parseAmount } from '../../Functions';
+import { parseAmount, getUser } from '../../Functions';
 import Header from '../../components/Header';
 import { getUserBookAmounts } from '../../data/Admin';
+import Forbidden from '../../components/Forbidden';
 moment.locale('nl');
 
 const CustomerKasboek = (props) => {
+  const [userIsAdmin, setUserIsAdmin] = useState(0);
   const [beginSaldo, setBeginSaldo] = useState(0);
   const [currentBook, setCurrentBook] = useState([]);
   const [beginMonth, setBeginMonth] = useState(0);
@@ -21,7 +23,7 @@ const CustomerKasboek = (props) => {
   const [selectedMonth, setSelectedMonth] = useState(1);
   const printRef = useRef();
 
-  const formats = ["DD-MM-YYYY", "YYYY-MM-DD"];
+  const formats = ["DD-MM-YYYY"];
   const filteredIncomes = useramounts.incomes.filter(income => moment(income.date, formats, true).month() + 1 === selectedMonth);
   const filteredExpanses = useramounts.expanses.filter(expanse => moment(expanse.date, formats, true).month() + 1 === selectedMonth);
 
@@ -39,20 +41,28 @@ const CustomerKasboek = (props) => {
   }
 
   const getData = async () => {
-    if (props.router.bookid) {
-      getBookYearAmounts(props.router.bookid, props.router.customerid);
+    const user = await getUser();
+    
+    if(user.isAdmin === 1){
+        setUserIsAdmin(user.isAdmin);
+        
+        try {
+          if (props.router.bookid) {
+            getBookYearAmounts(props.router.bookid, props.router.customerid);
+
+            getUserSaldo(props.router.bookid).then((bookSaldo) => {
+              setBeginSaldo(bookSaldo.startsaldo);
+              setCurrentBook(bookSaldo);
+            });
+          }
+        } catch (error) {
+            console.error("Error fetching user books:", error);
+        }
     }
   }
 
   useEffect(() => {
-    if (props.router.bookid) {
-      getBookYearAmounts(props.router.bookid, props.router.customerid);
-
-      getUserSaldo(props.router.bookid).then((bookSaldo) => {
-        setBeginSaldo(bookSaldo.startsaldo);
-        setCurrentBook(bookSaldo);
-      });
-    }
+    getData();
   }, [props.router.bookid]);
 
   useEffect(() => {
@@ -86,18 +96,22 @@ const CustomerKasboek = (props) => {
 
       <div className='pdf-loader-screen'></div>
       <div className="content" style={{ marginLeft: 0 }} ref={printRef}>
-        <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth} admin="true"/>
-        <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setCurrentActiveMonth={setCurrentActiveMonth} />   
+        {userIsAdmin === 1 ? (
+          <React.Fragment>
+            <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth} admin="true"/>
+            <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setCurrentActiveMonth={setCurrentActiveMonth} />   
 
-        <div className='row'>
-          <div className='col-md-6'>
-            <Amounts type="1" filteredAmounts={filteredIncomes} getData={getData} bookid={props.router.bookid} admin="true"/>
-          </div>
+            <div className='row'>
+              <div className='col-md-6'>
+                <Amounts type="1" filteredAmounts={filteredIncomes} getData={getData} bookid={props.router.bookid} admin="true"/>
+              </div>
 
-          <div className='col-md-6'>
-            <Amounts type="2" filteredAmounts={filteredExpanses} getData={getData} bookid={props.router.bookid} admin="true"/>
-          </div>
-        </div>
+              <div className='col-md-6'>
+                <Amounts type="2" filteredAmounts={filteredExpanses} getData={getData} bookid={props.router.bookid} admin="true"/>
+              </div>
+            </div>
+          </React.Fragment>
+        ) : <Forbidden />}
       </div>
     </React.Fragment>
   )

@@ -301,7 +301,7 @@ p{
 .header ul li{
     list-style-type: none;
     display: inline-block;
-    margin: 0 15px;
+    margin: 0 3px;
     font-weight: 400;
     font-size: 15px;
 }

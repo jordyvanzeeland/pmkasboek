@@ -20,3 +20,7 @@ export const updateUserSaldos = async (bookid, year, startSaldo) => {
         startsaldo: startSaldo
     });
 }
+
+export const deleteUserSaldos = async (bookid) => {
+    return fetchApi('DELETE', `saldos/${bookid}/delete`);
+}
