@@ -6,14 +6,18 @@ import withAuth from '../../components/withAuth';
 import Header from '../../components/Header';
 import { getUser } from "../../Functions";
 import Forbidden from '../../components/Forbidden';
+import Loader from '../../components/Loader';
 
 moment.locale('nl');
 
 function Customers() {
     const [customers, setCustomers] = useState([]);
     const [userIsAdmin, setUserIsAdmin] = useState(0);
+    const [noAccess, setNoAccess] = useState(false);
+    const [showLoader, setShowLoader] = useState(false);
 
     const getData = async () => {
+        setShowLoader(true);
         const user = await getUser();
         
         if(user.isAdmin === 1){
@@ -25,7 +29,11 @@ function Customers() {
             } catch (error) {
                 console.error("Error fetching user books:", error);
             }
+        }else{
+            setNoAccess(true);
         }
+
+        setShowLoader(false);
     }
 
     useEffect(() => {
@@ -35,11 +43,14 @@ function Customers() {
     return (
         <React.Fragment>
             <Header isAdmin="true"/>
-            <div className='content' style={{ marginLeft: 0 }}>
+            {showLoader && (<Loader />)}
 
+            <div className='content' style={{ marginLeft: 0 }}>
                 <div className='row'>
                     <div className='col-md-12'>
-                        {userIsAdmin === 1 ? (
+                        {noAccess && (<Forbidden />)}
+
+                        {!noAccess && userIsAdmin === 1 && (
                             <div className='card'>
                                 <h3><i className="fa-solid fa-users"></i> Klantoverzicht</h3> 
 
@@ -66,9 +77,7 @@ function Customers() {
                                     </tbody>
                                 </table>
                             </div>
-                        ) : <Forbidden />}
-
-                        
+                        )}
                     </div>
                 </div>
             </div>

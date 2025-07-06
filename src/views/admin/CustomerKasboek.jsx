@@ -10,10 +10,13 @@ import { parseAmount, getUser } from '../../Functions';
 import Header from '../../components/Header';
 import { getUserBookAmounts } from '../../data/Admin';
 import Forbidden from '../../components/Forbidden';
+import Loader from '../../components/Loader';
 moment.locale('nl');
 
 const CustomerKasboek = (props) => {
   const [userIsAdmin, setUserIsAdmin] = useState(0);
+  const [noAccess, setNoAccess] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
   const [beginSaldo, setBeginSaldo] = useState(0);
   const [currentBook, setCurrentBook] = useState([]);
   const [beginMonth, setBeginMonth] = useState(0);
@@ -41,6 +44,7 @@ const CustomerKasboek = (props) => {
   }
 
   const getData = async () => {
+    setShowLoader(true);
     const user = await getUser();
     
     if(user.isAdmin === 1){
@@ -54,11 +58,17 @@ const CustomerKasboek = (props) => {
               setBeginSaldo(bookSaldo.startsaldo);
               setCurrentBook(bookSaldo);
             });
+
+            document.querySelector('.loader_container').style.display = "none";
           }
         } catch (error) {
             console.error("Error fetching user books:", error);
         }
+    }else{
+      setNoAccess(true);
     }
+
+    setShowLoader(false);
   }
 
   useEffect(() => {
@@ -93,10 +103,13 @@ const CustomerKasboek = (props) => {
   return (
     <React.Fragment>
       <Header isAdmin="true"/>
+      {showLoader && (<Loader />)}
 
       <div className='pdf-loader-screen'></div>
       <div className="content" style={{ marginLeft: 0 }} ref={printRef}>
-        {userIsAdmin === 1 ? (
+        {noAccess && (<Forbidden />)}
+
+        {!noAccess && userIsAdmin === 1 && (
           <React.Fragment>
             <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth} admin="true"/>
             <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setCurrentActiveMonth={setCurrentActiveMonth} />   
@@ -111,7 +124,7 @@ const CustomerKasboek = (props) => {
               </div>
             </div>
           </React.Fragment>
-        ) : <Forbidden />}
+        )}
       </div>
     </React.Fragment>
   )

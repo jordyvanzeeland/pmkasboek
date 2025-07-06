@@ -82,7 +82,7 @@ function UserBooks() {
                                         <td className='align-middle'>&euro; {book.startsaldo}</td>
                                         <td>
                                             <button onClick={() => deleteBook(book.id)}className="delete-book">
-                                                <i className="fa-solid fa-trash-can"></i>
+                                                <i className="fa-solid fa-trash-can" style={{fontSize: '13px'}} ></i>
                                             </button>
                                         </td>
                                     </tr>

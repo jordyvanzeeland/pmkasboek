@@ -322,11 +322,12 @@ p{
     color: #ffffff;
     background: linear-gradient(45deg, rgb(170, 0, 0), darkred);
     color: #ffffff;
-    width: 25px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     text-align: center;
     border-radius: 50%;
-    line-height: 30px;
+    line-height: 0px;
+    padding: 14px 0;
 }
 
 .sidebar{
