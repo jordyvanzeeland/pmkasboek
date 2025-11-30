@@ -27,6 +27,8 @@ const CustomerKasboek = (props) => {
   const [customer, setCustomer] = useState('');
   const printRef = useRef();
 
+  let newSaldo = 0;
+
   const formats = ["DD-MM-YYYY"];
   let filteredAll = useramounts.all?.filter(amount => moment(amount.date, formats, true).month() + 1 === selectedMonth);
   filteredAll = filteredAll?.length > 0 ? sortOnDate(filteredAll, false) : filteredAll;
@@ -135,6 +137,7 @@ const CustomerKasboek = (props) => {
                     <th>Ontvangst</th>
                     <th>Uitgave</th>
                     <th>Code</th>
+                    <th>Saldo</th>
                   </tr>
                   <tr>
                     <th></th>
@@ -142,10 +145,19 @@ const CustomerKasboek = (props) => {
                     <th>{selectedMonth - 1 !== 0 ? monthlySaldo[selectedMonth - 2]?.toFixed(2).replace(".", ","): beginSaldo}</th>
                     <th></th>
                     <th></th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredAll?.map(amount => {
+                  {filteredAll?.map((amount, index) => {
+                    const currentBeginSaldo = selectedMonth - 1 !== 0 ? monthlySaldo[selectedMonth - 2]?.toFixed(2).replace(".", ","): beginSaldo;
+                    
+                    if(index === 0){
+                      newSaldo = amount.type?.id === 1 ? parseFloat(currentBeginSaldo) + parseFloat(amount.amount) : parseFloat(currentBeginSaldo) - parseFloat(amount.amount);
+                    }else{
+                      newSaldo = amount.type?.id === 1 ? parseFloat(newSaldo) + parseFloat(amount.amount) : parseFloat(newSaldo) - parseFloat(amount.amount);
+                    }
+
                     return(
                       <React.Fragment>
                         <tr>
@@ -154,6 +166,7 @@ const CustomerKasboek = (props) => {
                           <td>{amount.type?.id === 1 ? amount.amount : ''}</td>
                           <td>{amount.type?.id === 2 ? amount.amount : ''}</td>
                           <td style={{width: "15%"}}><input id={`amountcode-${amount.id}`} data-id={amount.id} onChange={(event) => updateAmountCode(amount.id, event.target.value)} className="form-control" type='text' defaultValue={amount.code}/></td>
+                          <td>{newSaldo}</td>
                         </tr>
                       </React.Fragment>
                     )
