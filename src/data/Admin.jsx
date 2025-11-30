@@ -14,3 +14,9 @@ export const getUserBookAmounts = async (bookid, userid) => {
         "userid": userid
     });
 }
+
+export const updateCodeOfAmount = async (amountid, code) => {
+    return fetchApi('PUT', `admin/amounts/${amountid}/update/code`, null, {
+        "code": code
+    });
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { debounce } from "lodash";
 import { parseAmount, sortOnDate } from '../Functions';
 import { updateUserAmount, insertUserAmount, deleteUserAmount } from '../data/Amounts';
+import { updateCodeOfAmount } from '../data/Admin';
 
 const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
     const [amounts, setAmounts] = useState([]);
@@ -25,6 +26,10 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
         await updateUserAmount(id, updateDate, updateDesc, parsedMoney, type, bookid);
         await getData(bookid);
     }, 500)
+
+    const updateAmountCode = async (amountid, code) => {
+        await updateCodeOfAmount(amountid, code);
+    }
 
     const handleFieldChange = (id, field, value) => {
         const updatedItem = amounts.find(item => item.id === id);
@@ -60,6 +65,7 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
                             <th>Datum</th>
                             <th>Beschrijving</th>
                             <th>Bedrag</th>
+                            {admin && ( <th>Code</th> )}
                             {!admin && ( <th className="noPrint"></th> )}
                         </tr>
                     </thead>
@@ -68,6 +74,7 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
                             <td><input className='form-control' type='text' name='amountdate' id='amountdate' placeholder='DD-MM-YYYY'/></td>
                             <td><input className='form-control' type='text' name='amountdesc' id='amountdesc' /></td>
                             <td><input className='form-control' type='text' name='amountmoney' id='amountmoney' /></td>
+                            { admin && ( <td><input className='form-control' type='text' name='amountcode' id='amountcode' /></td> )}
                             <td><input className='form-control' type="submit" name="submit" value="Toevoegen" /></td>
                         </tr>)}
 
@@ -85,6 +92,7 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
                                 <td><div id={`amountdate-${item.id}`}>{item.date}</div></td>
                                 <td><div id={`amountdesc-${item.id}`}>{item.description}</div></td>
                                 <td><div id={`amountmoney-${item.id}`}>{item.amount}</div></td>
+                                <td style={{width: "15%"}}><input id={`amountcode-${item.id}`} data-id={item.id} onChange={(event) => updateAmountCode(item.id, event.target.value)} className='form-control' type='text' defaultValue={item.code}/></td>
                             </tr> )}
                             </React.Fragment>
                         )
