@@ -380,6 +380,10 @@ p{
     right: 14px;
 }
 
+.amounts table tr td{
+    vertical-align: middle;
+}
+
 @media print {
     .onlyPDF{
         display: block;

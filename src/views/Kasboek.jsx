@@ -9,7 +9,7 @@ import Sidebar from '../components/Sidebar';
 import MonthSelector from '../components/MonthSelector';
 import Saldo from '../components/Saldo';
 import Amounts from '../components/Amounts';
-import { parseAmount } from '../Functions';
+import { parseAmount, sortOnDate } from '../Functions';
 import Header from '../components/Header';
 moment.locale('nl');
 
@@ -26,6 +26,9 @@ const Kasboek = (props) => {
   const printRef = useRef();
 
   const formats = ["DD-MM-YYYY"];
+  let filteredAll = useramounts.all?.filter(amount => moment(amount.date, formats, true).month() + 1 === selectedMonth);
+  filteredAll = filteredAll?.length > 0 ? sortOnDate(filteredAll, false) : filteredAll;
+
   const filteredIncomes = useramounts.incomes.filter(income => moment(income.date, formats, true).month() + 1 === selectedMonth);
   const filteredExpanses = useramounts.expanses.filter(expanse => moment(expanse.date, formats, true).month() + 1 === selectedMonth);
 
@@ -33,6 +36,7 @@ const Kasboek = (props) => {
     try {
       const amounts = await getBookAmounts(bookid);
       setUseramounts({
+        all: amounts,
         incomes: amounts.filter(amount => amount.type.id === 1),
         expanses: amounts.filter(amount => amount.type.id === 2)
       });
@@ -92,7 +96,53 @@ const Kasboek = (props) => {
         <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth}/>
         <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setCurrentActiveMonth={setCurrentActiveMonth} />   
 
-        <div className='row'>
+        <div className='amounts showPrint'>
+              <h3>Kasboek - {document.getElementsByClassName('user')[0]?.innerHTML} - {currentActiveMonth} {currentBook.bookyear}</h3>
+              <table className='table'>
+                <thead>
+                  <tr>
+                    <th>Datum</th>
+                    <th>Omschrijving</th>
+                    <th>Ontvangst</th>
+                    <th>Uitgave</th>
+                    <th>Code</th>
+                  </tr>
+                  <tr>
+                    <th></th>
+                    <th>Beginsaldo</th>
+                    <th>{selectedMonth - 1 !== 0 ? monthlySaldo[selectedMonth - 2]?.toFixed(2).replace(".", ","): beginSaldo}</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAll?.map(amount => {
+                    return(
+                      <React.Fragment>
+                        <tr>
+                          <td>{amount.date}</td>
+                          <td>{amount.description}</td>
+                          <td>{amount.type?.id === 1 ? amount.amount : ''}</td>
+                          <td>{amount.type?.id === 2 ? amount.amount : ''}</td>
+                          <td style={{width: "15%"}}><input id={`amountcode-${amount.id}`} data-id={amount.id} onChange={(event) => updateAmountCode(amount.id, event.target.value)} className="form-control" type='text' defaultValue={amount.code}/></td>
+                        </tr>
+                      </React.Fragment>
+                    )
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th></th>
+                    <th>Eindsaldo</th>
+                    <th>{monthlySaldo[selectedMonth - 1]?.toFixed(2).replace(".", ",")}</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </tfoot>
+              </table>
+              </div>
+
+        <div className='row noPrint'>
           <div className='col-md-6'>
             <Amounts type="1" filteredAmounts={filteredIncomes} getData={getData} bookid={props.router.bookid} />
           </div>

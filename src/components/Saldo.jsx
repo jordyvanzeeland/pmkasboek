@@ -3,7 +3,7 @@ import { debounce } from "lodash";
 import { updateUserSaldos } from '../data/Saldos';
 import { printToPDF } from '../Functions';
 
-const Saldo = ({ currentActiveMonth, currentBook, setBeginSaldo, monthlySaldo, selectedMonth, admin }) => {
+const Saldo = ({ customer, currentActiveMonth, currentBook, setBeginSaldo, monthlySaldo, selectedMonth, admin }) => {
     const monthTotal = monthlySaldo[selectedMonth - 1]?.toFixed(2).replace(".", ",");
     const totalNegative = document.querySelector(".totalNegative");
     const currentBookYear = useRef();
@@ -23,9 +23,8 @@ const Saldo = ({ currentActiveMonth, currentBook, setBeginSaldo, monthlySaldo, s
     }
 
     return (
-        <div className='currentsaldo'>
+        <div className={`currentsaldo noPrint`}>
             <div className='row'>
-                <div className='nameOverview showPrint'>Overzicht {currentActiveMonth}</div>
           
                 <div className='col-md-6'>
                     {!admin && (
@@ -37,6 +36,7 @@ const Saldo = ({ currentActiveMonth, currentBook, setBeginSaldo, monthlySaldo, s
 
                     {admin && (
                         <React.Fragment>
+                            <div className='showPrint' style={{ fontWeight: 400 }}>Klant: {customer}</div>
                             Boekjaar: <div className="bookYear" type="text" name="bookYear" style={{ width: 'fit-content', fontWeight: 400, marginLeft: '5px' }}>{currentBook.bookyear}</div>
                             Beginsaldo: <div className='beginSaldo' type="text" name="beginSaldo" style={{ width: 'fit-content', fontWeight: 400, marginLeft: '5px' }}>{currentBook.startsaldo}</div>
                         </React.Fragment>
@@ -47,7 +47,7 @@ const Saldo = ({ currentActiveMonth, currentBook, setBeginSaldo, monthlySaldo, s
                 </div>
 
                 <div className='col-md-6'>
-                    <div className='saldo'>Totaal saldo: <span className="amountsTotal" style={{ color: parseFloat(monthTotal) < 0 ? "darkred" : "#000000" }}>&euro; {monthTotal}</span></div>
+                    <div className={`saldo ${admin ? 'noPrint' : ''}`}>Totaal saldo: <span className="amountsTotal" style={{ color: parseFloat(monthTotal) < 0 ? "darkred" : "#000000" }}>&euro; {monthTotal}</span></div>
                     <div className="totalNegative noPrint">LET OP! Het totaal saldo is nu negatief.</div>
                 </div>
             </div>

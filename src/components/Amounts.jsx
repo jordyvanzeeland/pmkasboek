@@ -27,10 +27,6 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
         await getData(bookid);
     }, 500)
 
-    const updateAmountCode = async (amountid, code) => {
-        await updateCodeOfAmount(amountid, code);
-    }
-
     const handleFieldChange = (id, field, value) => {
         const updatedItem = amounts.find(item => item.id === id);
         if (!updatedItem) return;
@@ -63,7 +59,7 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
                     <thead>
                         <tr>
                             <th>Datum</th>
-                            <th>Beschrijving</th>
+                            <th>Omschrijving</th>
                             <th>Bedrag</th>
                             {admin && ( <th>Code</th> )}
                             {!admin && ( <th className="noPrint"></th> )}
@@ -92,7 +88,7 @@ const Amounts = ({ type, filteredAmounts, getData, bookid, admin}) => {
                                 <td><div id={`amountdate-${item.id}`}>{item.date}</div></td>
                                 <td><div id={`amountdesc-${item.id}`}>{item.description}</div></td>
                                 <td><div id={`amountmoney-${item.id}`}>{item.amount}</div></td>
-                                <td style={{width: "15%"}}><input id={`amountcode-${item.id}`} data-id={item.id} onChange={(event) => updateAmountCode(item.id, event.target.value)} className='form-control' type='text' defaultValue={item.code}/></td>
+                                <td style={{width: "15%"}}><input id={`amountcode-${item.id}`} data-id={item.id} onChange={(event) => updateAmountCode(item.id, event.target.value)} className={`form-control ${!admin ? 'noPrint' : ''}`} type='text' defaultValue={item.code}/></td>
                             </tr> )}
                             </React.Fragment>
                         )

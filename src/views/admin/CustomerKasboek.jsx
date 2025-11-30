@@ -6,9 +6,9 @@ import withAuth from '../../components/withAuth';
 import MonthSelector from '../../components/MonthSelector';
 import Saldo from '../../components/Saldo';
 import Amounts from '../../components/Amounts';
-import { parseAmount, getUser } from '../../Functions';
+import { parseAmount, getUser, sortOnDate } from '../../Functions';
 import Header from '../../components/Header';
-import { getUserBookAmounts } from '../../data/Admin';
+import { getCustomerByID, getUserBookAmounts, updateCodeOfAmount } from '../../data/Admin';
 import Forbidden from '../../components/Forbidden';
 import Loader from '../../components/Loader';
 moment.locale('nl');
@@ -24,17 +24,25 @@ const CustomerKasboek = (props) => {
   const [monthlySaldo, setMonthlySaldo] = useState(Array(12).fill(0));
   const [useramounts, setUseramounts] = useState({ incomes: [], expanses: [] });
   const [selectedMonth, setSelectedMonth] = useState(1);
+  const [customer, setCustomer] = useState('');
   const printRef = useRef();
 
   const formats = ["DD-MM-YYYY"];
+  let filteredAll = useramounts.all?.filter(amount => moment(amount.date, formats, true).month() + 1 === selectedMonth);
+  filteredAll = filteredAll?.length > 0 ? sortOnDate(filteredAll, false) : filteredAll;
+
   const filteredIncomes = useramounts.incomes.filter(income => moment(income.date, formats, true).month() + 1 === selectedMonth);
   const filteredExpanses = useramounts.expanses.filter(expanse => moment(expanse.date, formats, true).month() + 1 === selectedMonth);
+
+  const updateAmountCode = async (amountid, code) => {
+    await updateCodeOfAmount(amountid, code);
+  }
 
   const getBookYearAmounts = async(bookid, customerid) => {
     try {
       const amounts = await getUserBookAmounts(bookid, customerid);
-      console.log(amounts);
       setUseramounts({
+        all: amounts,
         incomes: amounts.filter(amount => amount.type.id === 1),
         expanses: amounts.filter(amount => amount.type.id === 2)
       });
@@ -46,6 +54,9 @@ const CustomerKasboek = (props) => {
   const getData = async () => {
     setShowLoader(true);
     const user = await getUser();
+
+    const getCurrentCustomer = await getCustomerByID(props.router.customerid);
+    setCustomer(getCurrentCustomer);
     
     if(user.isAdmin === 1){
         setUserIsAdmin(user.isAdmin);
@@ -111,17 +122,53 @@ const CustomerKasboek = (props) => {
 
         {!noAccess && userIsAdmin === 1 && (
           <React.Fragment>
-            <Saldo currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth} admin="true"/>
+            <Saldo customer={customer.name} currentActiveMonth={currentActiveMonth} currentBook={currentBook} setBeginSaldo={setBeginSaldo} monthlySaldo={monthlySaldo} selectedMonth={selectedMonth} admin="true"/>
             <MonthSelector selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} setCurrentActiveMonth={setCurrentActiveMonth} />   
 
-            <div className='row'>
-              <div className='col-md-6'>
-                <Amounts type="1" filteredAmounts={filteredIncomes} getData={getData} bookid={props.router.bookid} admin="true"/>
-              </div>
-
-              <div className='col-md-6'>
-                <Amounts type="2" filteredAmounts={filteredExpanses} getData={getData} bookid={props.router.bookid} admin="true"/>
-              </div>
+            <div className='amounts'>
+              <h3>Kasboek {customer.name} - {currentActiveMonth} {currentBook.bookyear}</h3>
+              <table className='table'>
+                <thead>
+                  <tr>
+                    <th>Datum</th>
+                    <th>Omschrijving</th>
+                    <th>Ontvangst</th>
+                    <th>Uitgave</th>
+                    <th>Code</th>
+                  </tr>
+                  <tr>
+                    <th></th>
+                    <th>Beginsaldo</th>
+                    <th>{selectedMonth - 1 !== 0 ? monthlySaldo[selectedMonth - 2]?.toFixed(2).replace(".", ","): beginSaldo}</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAll?.map(amount => {
+                    return(
+                      <React.Fragment>
+                        <tr>
+                          <td>{amount.date}</td>
+                          <td>{amount.description}</td>
+                          <td>{amount.type?.id === 1 ? amount.amount : ''}</td>
+                          <td>{amount.type?.id === 2 ? amount.amount : ''}</td>
+                          <td style={{width: "15%"}}><input id={`amountcode-${amount.id}`} data-id={amount.id} onChange={(event) => updateAmountCode(amount.id, event.target.value)} className="form-control" type='text' defaultValue={amount.code}/></td>
+                        </tr>
+                      </React.Fragment>
+                    )
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th></th>
+                    <th>Eindsaldo</th>
+                    <th>{monthlySaldo[selectedMonth - 1]?.toFixed(2).replace(".", ",")}</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           </React.Fragment>
         )}

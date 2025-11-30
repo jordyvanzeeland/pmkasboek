@@ -4,6 +4,10 @@ export const getCustomers = async () => {
     return fetchApi('GET', 'admin/customers');
 }
 
+export const getCustomerByID = async (customerid) => {
+    return fetchApi('GET', `admin/customers/${customerid}/info`);
+}
+
 export const getCustomerBooks = async (customerid) => {
     return fetchApi('GET', `admin/customers/${customerid}`);
 }
